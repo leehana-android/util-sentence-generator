@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="kr.co.leehana.sg.activity.SentenceActivity">
+	<item android:id="@+id/action_change_genre"
+	      android:title="@string/action_change_genre"
+	      android:orderInCategory="100"
+	      android:icon="@drawable/change_genre_w"
+	      app:showAsAction="ifRoom">
+		<menu>
+			<item android:id="@+id/submenu1" android:title="@string/empty" />
+		</menu>
+	</item>
+
+	<item android:id="@+id/action_refresh"
+	      android:title="@string/action_refresh"
+	      android:orderInCategory="100"
+	      android:icon="@drawable/refresh_w"
+	      app:showAsAction="ifRoom"/>
+
+	<item android:id="@+id/action_settings"
+	      android:title="@string/action_settings"
+	      android:orderInCategory="100"
+	      android:icon="@drawable/setting_w"
+	      app:showAsAction="never"/>
+</menu>
