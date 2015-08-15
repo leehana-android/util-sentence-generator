@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/genre_image"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/love_heart_48"
+        android:layout_marginRight="5dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="첫번재가 좋아 - 동시 (13)"
+        android:id="@+id/category_name"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/genre_image"
+        android:layout_toEndOf="@+id/genre_image"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="2015-08-14 23:10:10"
+        android:id="@+id/created_date"
+        android:layout_below="@+id/category_name"
+        android:layout_toRightOf="@+id/genre_image"
+        android:layout_toEndOf="@+id/genre_image"/>
+
+</RelativeLayout>
