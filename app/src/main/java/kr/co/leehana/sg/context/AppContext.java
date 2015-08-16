@@ -2,7 +2,12 @@ package kr.co.leehana.sg.context;
 
 import android.graphics.Color;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import kr.co.leehana.sg.model.Setting;
 import kr.co.leehana.sg.type.GenreType;
+import kr.co.leehana.sg.type.SentenceGenerateType;
 import kr.co.leehana.sg.type.WordType;
 
 /**
@@ -20,6 +25,19 @@ public class AppContext {
 	public static final int ACTION_BAR_TAB_COLOR = Color.rgb(8, 157, 227); //blaze orange
 	public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm";
 	public static final String [] FAVORITE_RATE = {"★☆☆☆☆","★★☆☆☆","★★★☆☆","★★★★☆","★★★★★"};
+	public static final int SETTING_SENTENCE_COUNT_IDX = 0;
+	public static final int SETTING_FIRST_WORD_IDX = 1;
+	public static final int SETTING_SECOND_WORD_IDX = 2;
+	public static final int SETTING_THIRD_WORD_IDX = 3;
+	public static final int SETTING_FOURTH_WORD_IDX = 4;
+	public static final List<Integer> SENTENCE_COUNT_ARRAY = new ArrayList<>();
+
+	static {
+		SENTENCE_COUNT_ARRAY.add(20);
+		SENTENCE_COUNT_ARRAY.add(30);
+		SENTENCE_COUNT_ARRAY.add(40);
+		SENTENCE_COUNT_ARRAY.add(50);
+	}
 
 	private static AppContext context = new AppContext();
 
@@ -35,10 +53,35 @@ public class AppContext {
 
 	private int favoriteViewIndex = -1;
 
+	private Setting setting;
+
 	private AppContext() {}
 
 	public static AppContext getInstance() {
 		return context;
+	}
+
+	public String getColorCodeForWord(WordType wordType) {
+		switch (wordType) {
+			case NOUN:
+				return "#CD812B";
+			case VERB:
+				return "#F17075";
+			case ADVERB:
+				return "#7B6A97";
+			case ADJECTIVE:
+				return "#608F63";
+		}
+
+		return "";
+	}
+
+	public Setting getSetting() {
+		return setting;
+	}
+
+	public void setSetting(Setting setting) {
+		this.setting = setting;
 	}
 
 	public int getFavoriteViewIndex() {

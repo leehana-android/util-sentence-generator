@@ -16,7 +16,11 @@ import kr.co.leehana.sg.activity.SentenceActivity;
 import kr.co.leehana.sg.activity.SettingsActivity;
 import kr.co.leehana.sg.context.AppContext;
 import kr.co.leehana.sg.converter.TypeConverter;
+import kr.co.leehana.sg.factory.DbHelperFactory;
 import kr.co.leehana.sg.model.WordStructure;
+import kr.co.leehana.sg.service.ISettingService;
+import kr.co.leehana.sg.service.SettingServiceImpl;
+import kr.co.leehana.sg.service.WordServiceImpl;
 import kr.co.leehana.sg.utils.DbUtils;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -32,14 +36,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 	private Intent intent;
 
+	private ISettingService settingService;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-//		getSupportActionBar().setBackgroundDrawable(new ColorDrawable(AppContext.ACTION_BAR_COLOR));
-
 		DbUtils.getInstance().prepareDatabase(getBaseContext());
+
+		settingService = SettingServiceImpl.getInstance();
+		((SettingServiceImpl) settingService).setHelper(DbHelperFactory.create(getBaseContext()));
+
+		if (AppContext.getInstance().getSetting() == null) {
+			AppContext.getInstance().setSetting(settingService.getSetting());
+		}
 
 		newWordBtn = (Button) findViewById(R.id.btn_new_word_input);
 		newWordBtn.setOnClickListener(this);

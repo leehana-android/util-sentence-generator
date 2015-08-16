@@ -87,4 +87,18 @@
 	<string name="db_upload">디비 업로드</string>
 	<string name="empty"/>
 	<string name="title_activity_upload_to_server">서버에 업로드</string>
+	<string name="random">무작위</string>
+	<string name="settings_first_word">첫번째 단어</string>
+	<string name="settings_fourth_word">네번째 단어</string>
+	<string name="settings_generate_count">문장 생성 갯수</string>
+	<string name="settings_second_word">두번째 단어</string>
+	<string name="settings_third_word">세번째 단어</string>
+	<string name="empty_word">없음</string>
+	<string name="settings_first_word_sub">첫번째 단어는 (%s) 보여주기</string>
+	<string name="settings_fourth_word_sub">네번째 단어는 (%s) 보여주기</string>
+	<string name="settings_generate_count_sub">문장의 창조 갯수는 (%s)개 이지롱~</string>
+	<string name="settings_second_word_sub">두번째 단어는 (%s) 보여주기</string>
+	<string name="settings_third_word_sub">세번째 단어는 (%s) 보여주기</string>
+	<string name="settings_sentence_count_dialog_title">문장 갯수 선택</string>
+	<string name="settings_word_dialog_title">단어 선택</string>
 </resources>

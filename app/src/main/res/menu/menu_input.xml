@@ -22,5 +22,5 @@
 	      android:title="@string/delete_setting"
 	      android:orderInCategory="100"
 	      android:icon="@drawable/trash_w"
-	      app:showAsAction="ifRoom" />
+	      app:showAsAction="always" />
 </menu>

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,6 +14,8 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -71,7 +74,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 	private int mCurrentTabPosition = 0;
 
 	private Menu mOptionsMenu;
-	private List<String> mTempFavoriteList = new ArrayList<>();
+	private List<Spanned> mTempFavoriteList = new ArrayList<>();
 	private List<ActionBar.Tab> tabs = new ArrayList<>(2);
 
 	@Override
@@ -174,9 +177,10 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 
 		//noinspection SimplifiableIfStatement
 		if (itemId == R.id.action_settings) {
-			return true;
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
 		} else if (itemId == R.id.action_refresh) {
-			List<String> newSentence = generateSentence();
+			List<Spanned> newSentence = generateSentence();
 			updateSentenceListView(newSentence);
 			updateSentenceTabTitle(newSentence);
 		} else if (itemId == GenreType.POETRY.hashCode()) {
@@ -245,10 +249,10 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 
 					for (int i = 0; i < totalItemCount; i++) {
 						if (favoriteListView.isItemChecked(i)) {
-							String selectedItemText = favoriteListView.getItemAtPosition(i).toString();
+							Spanned selectedItemText = (Spanned) favoriteListView.getItemAtPosition(i);
 							int itemIndex = mTempFavoriteList.indexOf(selectedItemText);
 							Float floatValue = ratingValue;
-							selectedItemText = selectedItemText + AppContext.FAVORITE_RATE[floatValue.intValue() - 1];
+							selectedItemText = Html.fromHtml(Html.toHtml(selectedItemText) + AppContext.FAVORITE_RATE[floatValue.intValue() - 1]);
 
 							mTempFavoriteList.remove(itemIndex);
 							mTempFavoriteList.add(itemIndex, selectedItemText);
@@ -289,7 +293,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 
 					for (int i = 0; i < totalItemCount; i++) {
 						if (favoriteListView.isItemChecked(i)) {
-							String selectedItemText = favoriteListView.getItemAtPosition(i).toString();
+							Spanned selectedItemText = (Spanned) favoriteListView.getItemAtPosition(i);
 							mTempFavoriteList.remove(selectedItemText);
 						}
 					}
@@ -319,7 +323,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 
 			for (int i = 0; i < totalItemCount; i++) {
 				if (sentenceListView.isItemChecked(i)) {
-					String selectedItemText = sentenceListView.getItemAtPosition(i).toString();
+					Spanned selectedItemText = (Spanned) sentenceListView.getItemAtPosition(i);
 					if (!mTempFavoriteList.contains(selectedItemText)) {
 						sentenceListView.setItemChecked(i, false);
 					}
@@ -412,7 +416,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 
 				long saveNewFavoriteTime = System.currentTimeMillis();
 				for (int i = 0; i < totalItemCount; i++) {
-					String sentenceItemText = favoriteListView.getItemAtPosition(i).toString();
+					Spanned sentenceItemText = (Spanned) favoriteListView.getItemAtPosition(i);
 					Favorite newFavorite = new Favorite();
 
 					int ratingValue = StringUtils.countMatches(sentenceItemText, "★");
@@ -421,8 +425,12 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 						ratingValue = 1;
 					}
 
-					sentenceItemText = sentenceItemText.replaceAll("★", "").replaceAll("☆", "");
-					newFavorite.setSentence(sentenceItemText);
+					String sentenceItemString = Html.toHtml(sentenceItemText);
+					if (sentenceItemString.contains("&#9733;") || sentenceItemString.contains("&#9734;")) {
+						sentenceItemString = sentenceItemString.substring(0, sentenceItemString.lastIndexOf("<p dir=\"ltr\">"));
+					}
+
+					newFavorite.setSentence(sentenceItemString);
 					newFavorite.setParentId(favoriteCategory.getId());
 					newFavorite.setRate(ratingValue);
 					newFavorite.setEnabled(true);
@@ -561,33 +569,33 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		getSupportActionBar().setTitle(actionBarTitle);
 	}
 
-	private List<String> generateSentence() {
+	private List<Spanned> generateSentence() {
 		return new SentenceGenerator(AppContext.getInstance().getGenreType(), mWordService).generate();
 	}
 
-	private void updateFavoriteListView(List<String> generatedSentence) {
+	private void updateFavoriteListView(List<Spanned> generatedSentence) {
 		if (mFavoriteFragment != null && mFavoriteFragment.getView() != null) {
 			updateListView(mFavoriteFragment, generatedSentence);
 		}
 	}
 
-	private void updateSentenceListView(List<String> generatedSentence) {
+	private void updateSentenceListView(List<Spanned> generatedSentence) {
 		if (mSentenceFragment != null && mSentenceFragment.getView() != null) {
 			updateListView(mSentenceFragment, generatedSentence);
 		}
 	}
 
-	private void updateListView(Fragment fragment, List<String> data) {
+	private void updateListView(Fragment fragment, List<Spanned> data) {
 		ListView listView = (ListView) fragment.getView().findViewById(android.R.id.list);
 		listView.invalidate();
 		listView.setAdapter(createSentenceArrayAdapter(fragment.getActivity().getBaseContext(), data));
 	}
 
-	private ArrayAdapter<String> createSentenceArrayAdapter(Context context, List<String> data) {
+	private ArrayAdapter<Spanned> createSentenceArrayAdapter(Context context, List<Spanned> data) {
 		return new ArrayAdapter<>(context, R.layout.generated_list_item, data);
 	}
 
-	private ArrayAdapter<String> createFavoriteArrayAdapter(Context context, List<String> data) {
+	private ArrayAdapter<Spanned> createFavoriteArrayAdapter(Context context, List<Spanned> data) {
 		return new ArrayAdapter<>(context, R.layout.generated_list_item, data);
 	}
 
@@ -611,7 +619,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		                         Bundle savedInstanceState) {
 			if (currentPosition == 0) {
-				List<String> sentenceList = generateSentence();
+				List<Spanned> sentenceList = generateSentence();
 				setListAdapter(createSentenceArrayAdapter(getActivity().getBaseContext(), sentenceList));
 				updateSentenceTabTitle(sentenceList);
 			} else if (currentPosition == 1) {
@@ -640,13 +648,18 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 				CheckedTextView checkedTextView = (CheckedTextView) v;
 
 				if (checkedTextView.isChecked()) {
-					mTempFavoriteList.add(checkedTextView.getText().toString());
+					Spanned spannedText = (Spanned) checkedTextView.getText();
+					mTempFavoriteList.add(spannedText);
 				} else {
 					if (!mTempFavoriteList.isEmpty()) {
-						String removeTargetString = null;
-						for (String favoriteString : mTempFavoriteList) {
-							String originalString = favoriteString.replaceAll("★", "").replaceAll("☆", "");
-							if (originalString.equals(checkedTextView.getText().toString())) {
+						Spanned removeTargetString = null;
+						for (Spanned favoriteString : mTempFavoriteList) {
+							String favoriteItemString = Html.toHtml(favoriteString);
+							if (favoriteItemString.contains("&#9733;") || favoriteItemString.contains("&#9734;")) {
+								favoriteItemString = favoriteItemString.substring(0, favoriteItemString.lastIndexOf("<p dir=\"ltr\">"));
+							}
+
+							if (favoriteItemString.equals(Html.toHtml((Spanned) checkedTextView.getText()))) {
 								removeTargetString = favoriteString;
 								break;
 							}
@@ -663,7 +676,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		}
 	}
 
-	private void updateSentenceTabTitle(List<String> sentenceList) {
+	private void updateSentenceTabTitle(List<Spanned> sentenceList) {
 		tabs.get(0).setText(getString(R.string.title_generated, sentenceList.size()));
 	}
 

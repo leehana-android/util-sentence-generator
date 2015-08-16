@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -158,7 +159,8 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 		//noinspection SimplifiableIfStatement
 		if (id == R.id.action_settings) {
-			return true;
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
 		} else if (id == R.id.select_all_setting) {
 			if (mFragment != null && mFragment.getView() != null) {
 				ListView wordListView = (ListView) mFragment.getView().findViewById(android.R.id.list);

@@ -1,196 +1,223 @@
 package kr.co.leehana.sg.activity;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
-
-import java.util.List;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import kr.co.leehana.sg.R;
+import kr.co.leehana.sg.adapter.SettingsAdapter;
+import kr.co.leehana.sg.context.AppContext;
+import kr.co.leehana.sg.converter.TypeConverter;
+import kr.co.leehana.sg.factory.DbHelperFactory;
+import kr.co.leehana.sg.model.Setting;
+import kr.co.leehana.sg.service.ISettingService;
+import kr.co.leehana.sg.service.SettingServiceImpl;
 
+public class SettingsActivity extends AppCompatActivity {
 
-/**
- * A {@link PreferenceActivity} that presents a set of application settings. On
- * handset devices, settings are presented as a single list. On tablets,
- * settings are split by category, with category headers shown to the left of
- * the list of settings.
- * <p/>
- * See <a href="http://developer.android.com/design/patterns/settings.html">
- * Android Design: Settings</a> for design guidelines and the <a
- * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
- * API Guide</a> for more information on developing a Settings UI.
- */
-public class SettingsActivity extends PreferenceActivity {
+	private Setting mSetting;
 
+	private ISettingService mSettingService;
 
-	/**
-	 * {@inheritDoc}
-	 */
+	private ListView mSettingListView;
+
+	private ArrayAdapter<Setting> mAdapter;
+	private AlertDialog mSentenceCountSettingDialog;
+	private AlertDialog mFirstWordSettingDialog;
+	private AlertDialog mSecondWordSettingDialog;
+	private AlertDialog mThirdWordSettingDialog;
+	private AlertDialog mFourthWordSettingDialog;
+
 	@Override
-	public boolean onIsMultiPane() {
-		return isXLargeTablet(this);
-	}
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_settings);
 
-	/**
-	 * Helper method to determine if the device has an extra-large screen. For
-	 * example, 10" tablets are extra-large.
-	 */
-	private static boolean isXLargeTablet(Context context) {
-		return (context.getResources().getConfiguration().screenLayout
-				& Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-	}
+		mSettingService = SettingServiceImpl.getInstance();
+		((SettingServiceImpl) mSettingService).setHelper(DbHelperFactory.create(getBaseContext()));
 
+		mSetting = AppContext.getInstance().getSetting();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public void onBuildHeaders(List<Header> target) {
-		loadHeadersFromResource(R.xml.pref_headers, target);
-	}
+		createSettingArrayAdapter();
+		createSentenceCountSettingDialog();
+		createWordSettingDialog(AppContext.SETTING_FIRST_WORD_IDX);
+		createWordSettingDialog(AppContext.SETTING_SECOND_WORD_IDX);
+		createWordSettingDialog(AppContext.SETTING_THIRD_WORD_IDX);
+		createWordSettingDialog(AppContext.SETTING_FOURTH_WORD_IDX);
 
-	/**
-	 * A preference value change listener that updates the preference's summary
-	 * to reflect its new value.
-	 */
-	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-		@Override
-		public boolean onPreferenceChange(Preference preference, Object value) {
-			String stringValue = value.toString();
-
-			if (preference instanceof ListPreference) {
-				// For list preferences, look up the correct display value in
-				// the preference's 'entries' list.
-				ListPreference listPreference = (ListPreference) preference;
-				int index = listPreference.findIndexOfValue(stringValue);
-
-				// Set the summary to reflect the new value.
-				preference.setSummary(
-						index >= 0
-								? listPreference.getEntries()[index]
-								: null);
-
-			} else if (preference instanceof RingtonePreference) {
-				// For ringtone preferences, look up the correct display value
-				// using RingtoneManager.
-				if (TextUtils.isEmpty(stringValue)) {
-					// Empty values correspond to 'silent' (no ringtone).
-					preference.setSummary(R.string.pref_ringtone_silent);
-
-				} else {
-					Ringtone ringtone = RingtoneManager.getRingtone(
-							preference.getContext(), Uri.parse(stringValue));
-
-					if (ringtone == null) {
-						// Clear the summary if there was a lookup error.
-						preference.setSummary(null);
-					} else {
-						// Set the summary to reflect the new ringtone display
-						// name.
-						String name = ringtone.getTitle(preference.getContext());
-						preference.setSummary(name);
-					}
+		mSettingListView = (ListView) findViewById(R.id.settings_list_view);
+		mSettingListView.setAdapter(mAdapter);
+		mSettingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				switch (position) {
+					case AppContext.SETTING_SENTENCE_COUNT_IDX:
+						mSentenceCountSettingDialog.show();
+						break;
+					case AppContext.SETTING_FIRST_WORD_IDX:
+						mFirstWordSettingDialog.show();
+						break;
+					case AppContext.SETTING_SECOND_WORD_IDX:
+						mSecondWordSettingDialog.show();
+						break;
+					case AppContext.SETTING_THIRD_WORD_IDX:
+						mThirdWordSettingDialog.show();
+						break;
+					case AppContext.SETTING_FOURTH_WORD_IDX:
+						mFourthWordSettingDialog.show();
+						break;
 				}
-
-			} else {
-				// For all other preferences, set the summary to the value's
-				// simple string representation.
-				preference.setSummary(stringValue);
 			}
+		});
+	}
+
+	private ArrayAdapter<Setting> createSettingArrayAdapter() {
+		if (mAdapter == null) {
+			mAdapter = new SettingsAdapter(this, R.layout.settings_list_item, new Setting[]{mSetting});
+		}
+		return mAdapter;
+
+	}
+
+	private void createSentenceCountSettingDialog() {
+		int initIndex = AppContext.SENTENCE_COUNT_ARRAY.indexOf(AppContext.getInstance().getSetting().getSentenceCount());
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.settings_sentence_count_dialog_title);
+		builder.setCancelable(false);
+		builder.setIcon(R.drawable.settings_icon);
+
+		builder.setSingleChoiceItems(R.array.settings_generate_count_list, initIndex, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				mSetting.setSentenceCount(AppContext.SENTENCE_COUNT_ARRAY.get(which));
+//				AppContext.getInstance().getSetting().setSentenceCount(AppContext.SENTENCE_COUNT_ARRAY.get(which));
+			}
+		});
+
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				mAdapter.notifyDataSetChanged();
+				mSettingService.update(AppContext.getInstance().getSetting());
+			}
+		});
+
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+
+		mSentenceCountSettingDialog = builder.create();
+	}
+
+	private void createWordSettingDialog(final int wordSettingIndex) {
+
+		int initIndex = 0;
+		switch (wordSettingIndex) {
+			case AppContext.SETTING_FIRST_WORD_IDX:
+				initIndex = AppContext.getInstance().getSetting().getFirstWordType().getIndexCode();
+				break;
+			case AppContext.SETTING_SECOND_WORD_IDX:
+				initIndex = AppContext.getInstance().getSetting().getSecondWordType().getIndexCode();
+				break;
+			case AppContext.SETTING_THIRD_WORD_IDX:
+				initIndex = AppContext.getInstance().getSetting().getThirdWordType().getIndexCode();
+				break;
+			case AppContext.SETTING_FOURTH_WORD_IDX:
+				initIndex = AppContext.getInstance().getSetting().getFourthWordType().getIndexCode();
+				break;
+
+		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.settings_word_dialog_title);
+		builder.setCancelable(false);
+		builder.setIcon(R.drawable.settings_icon);
+
+		builder.setSingleChoiceItems(R.array.settings_word_list, initIndex, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				setWordGenerateValue(wordSettingIndex, which);
+			}
+		});
+
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				mAdapter.notifyDataSetChanged();
+				mSettingService.update(mSetting);
+			}
+		});
+
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+
+		switch (wordSettingIndex) {
+			case AppContext.SETTING_FIRST_WORD_IDX:
+				mFirstWordSettingDialog = builder.create();
+				break;
+			case AppContext.SETTING_SECOND_WORD_IDX:
+				mSecondWordSettingDialog = builder.create();
+				break;
+			case AppContext.SETTING_THIRD_WORD_IDX:
+				mThirdWordSettingDialog = builder.create();
+				break;
+			case AppContext.SETTING_FOURTH_WORD_IDX:
+				mFourthWordSettingDialog = builder.create();
+				break;
+		}
+	}
+
+	private void setWordGenerateValue(int wordIndex, int whichWord) {
+		switch (wordIndex) {
+			case AppContext.SETTING_FIRST_WORD_IDX:
+				mSetting.setFirstWordType(TypeConverter.intToSentenceGenerateType(whichWord));
+				break;
+			case AppContext.SETTING_SECOND_WORD_IDX:
+				mSetting.setSecondWordType(TypeConverter.intToSentenceGenerateType(whichWord));
+				break;
+			case AppContext.SETTING_THIRD_WORD_IDX:
+				mSetting.setThirdWordType(TypeConverter.intToSentenceGenerateType(whichWord));
+				break;
+			case AppContext.SETTING_FOURTH_WORD_IDX:
+				mSetting.setFourthWordType(TypeConverter.intToSentenceGenerateType(whichWord));
+				break;
+		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.menu_settings, menu);
+		return false;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+
+		//noinspection SimplifiableIfStatement
+		if (id == R.id.action_settings) {
 			return true;
 		}
-	};
 
-	/**
-	 * Binds a preference's summary to its value. More specifically, when the
-	 * preference's value is changed, its summary (line of text below the
-	 * preference title) is updated to reflect the value. The summary is also
-	 * immediately updated upon calling this method. The exact display format is
-	 * dependent on the type of preference.
-	 *
-	 * @see #sBindPreferenceSummaryToValueListener
-	 */
-	private static void bindPreferenceSummaryToValue(Preference preference) {
-		// Set the listener to watch for value changes.
-		preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-
-		// Trigger the listener immediately with the preference's
-		// current value.
-		sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-				PreferenceManager
-						.getDefaultSharedPreferences(preference.getContext())
-						.getString(preference.getKey(), ""));
-	}
-
-	/**
-	 * This fragment shows general preferences only. It is used when the
-	 * activity is showing a two-pane settings UI.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class GeneralPreferenceFragment extends PreferenceFragment {
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.pref_general);
-
-			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
-			// to their values. When their values change, their summaries are
-			// updated to reflect the new value, per the Android Design
-			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("example_text"));
-			bindPreferenceSummaryToValue(findPreference("example_list"));
-		}
-	}
-
-	/**
-	 * This fragment shows notification preferences only. It is used when the
-	 * activity is showing a two-pane settings UI.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class NotificationPreferenceFragment extends PreferenceFragment {
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.pref_notification);
-
-			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
-			// to their values. When their values change, their summaries are
-			// updated to reflect the new value, per the Android Design
-			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-		}
-	}
-
-	/**
-	 * This fragment shows data and sync preferences only. It is used when the
-	 * activity is showing a two-pane settings UI.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class DataSyncPreferenceFragment extends PreferenceFragment {
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.pref_data_sync);
-
-			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
-			// to their values. When their values change, their summaries are
-			// updated to reflect the new value, per the Android Design
-			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-		}
+		return super.onOptionsItemSelected(item);
 	}
 }

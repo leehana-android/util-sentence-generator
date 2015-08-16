@@ -1,6 +1,7 @@
 package kr.co.leehana.sg.converter;
 
 import kr.co.leehana.sg.type.GenreType;
+import kr.co.leehana.sg.type.SentenceGenerateType;
 import kr.co.leehana.sg.type.WordType;
 
 /**
@@ -36,5 +37,19 @@ public class TypeConverter {
 		}
 
 		return selectedType;
+	}
+
+	public static SentenceGenerateType intToSentenceGenerateType(Integer value) {
+		SentenceGenerateType sentenceGenerateType = null;
+		for (SentenceGenerateType type : SentenceGenerateType.values()) {
+			Integer indexCode = type.getIndexCode();
+
+			if (value.equals(indexCode)) {
+				sentenceGenerateType = type;
+				break;
+			}
+		}
+
+		return sentenceGenerateType;
 	}
 }

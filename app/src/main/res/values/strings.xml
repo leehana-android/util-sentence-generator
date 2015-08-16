@@ -118,4 +118,36 @@
 
 	<string name="title_activity_upload_to_server">UploadToServer</string>
 	<string name="db_upload">DB Upload</string>
+	<string name="title_activity_settings">SettingsActivity</string>
+
+	<string name="settings_sentence_count_dialog_title">Sentence Count</string>
+	<string name="settings_generate_count">Sentence Count</string>
+	<string name="settings_generate_count_sub">Generate sentence count (%d)</string>
+	<string-array name="settings_generate_count_list">
+		<item>20</item>
+		<item>30</item>
+		<item>40</item>
+		<item>50</item>
+	</string-array>
+
+	<string name="random">Random</string>
+	<string name="empty_word">Empty</string>
+
+	<string name="settings_word_dialog_title">Word choice</string>
+	<string name="settings_first_word">First word</string>
+	<string name="settings_first_word_sub">Show (%s)</string>
+	<string name="settings_second_word">Second word</string>
+	<string name="settings_second_word_sub">Show (%s)</string>
+	<string name="settings_third_word">Third word</string>
+	<string name="settings_third_word_sub">Show (%s)</string>
+	<string name="settings_fourth_word">Fourth word</string>
+	<string name="settings_fourth_word_sub">Show (%s)</string>
+	<string-array name="settings_word_list">
+		<item>@string/noun</item>
+		<item>@string/verb</item>
+		<item>@string/adverb</item>
+		<item>@string/adjective</item>
+		<item>@string/random</item>
+		<item>@string/empty_word</item>
+	</string-array>
 </resources>

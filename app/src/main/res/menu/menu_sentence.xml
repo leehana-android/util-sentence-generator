@@ -6,7 +6,7 @@
 	      android:title="@string/action_change_genre"
 	      android:orderInCategory="100"
 	      android:icon="@drawable/change_genre_w"
-	      app:showAsAction="ifRoom">
+	      app:showAsAction="always">
 		<menu>
 			<item android:id="@+id/submenu1" android:title="@string/empty" />
 		</menu>
@@ -16,7 +16,7 @@
 	      android:title="@string/action_refresh"
 	      android:orderInCategory="100"
 	      android:icon="@drawable/refresh_w"
-	      app:showAsAction="ifRoom"/>
+	      app:showAsAction="always"/>
 
 	<item android:id="@+id/action_settings"
 	      android:title="@string/action_settings"

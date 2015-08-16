@@ -3,12 +3,15 @@ package kr.co.leehana.sg.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -128,7 +131,8 @@ public class FavoriteViewActivity extends AppCompatActivity
 
 		//noinspection SimplifiableIfStatement
 		if (id == R.id.action_settings) {
-			return true;
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -162,13 +166,13 @@ public class FavoriteViewActivity extends AppCompatActivity
 			} else if (mSelectedRateCode > -1) {
 				favoriteList = mFavoriteService.getFavoritesByRate(mSelectedRateCode);
 			}
-			List<String> stringData = new ArrayList<>();
+			List<Spanned> stringData = new ArrayList<>();
 			if (favoriteList != null) {
 				for (Favorite favorite : favoriteList) {
-					stringData.add(favorite.getSentence());
+					stringData.add(Html.fromHtml(favorite.getSentence()));
 				}
 			}
-			ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_multiple_choice, stringData);
+			ArrayAdapter<Spanned> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_multiple_choice, stringData);
 			setListAdapter(adapter);
 			View rootView = inflater.inflate(R.layout.fragment_favorite_view, container, false);
 			return rootView;
