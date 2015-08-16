@@ -42,33 +42,35 @@ public class SentenceGenerator {
 	}
 
 	private void makeSentenceBaseData() {
-		List<WordType> tempList = new ArrayList<>(4);
-		tempList.add(WordType.NOUN);
-		tempList.add(WordType.VERB);
-		tempList.add(WordType.ADVERB);
-		tempList.add(WordType.ADJECTIVE);
+		List<WordType> tempWordTypeList = new ArrayList<>(4);
+		tempWordTypeList.add(WordType.NOUN);
+		tempWordTypeList.add(WordType.VERB);
+		tempWordTypeList.add(WordType.ADVERB);
+		tempWordTypeList.add(WordType.ADJECTIVE);
 
-		List<Words> firstWordList = null;
-		List<Words> secondWordList = null;
-		List<Words> thirdWordList = null;
-		List<Words> fourthWordList = null;
+		sentenceData.add(Collections.<Words>emptyList());
+		sentenceData.add(Collections.<Words>emptyList());
+		sentenceData.add(Collections.<Words>emptyList());
+		sentenceData.add(Collections.<Words>emptyList());
 
 		SentenceGenerateType sentenceGenerateType = setting.getFirstWordType();
+		int noneCount = 0;
+		int randomCount = 0;
 		switch (sentenceGenerateType) {
 			case NOUN:
 			case VERB:
 			case ADVERB:
 			case ADJECTIVE:
 				WordType selectedWordType = TypeConverter.intToWordType(sentenceGenerateType.getIndexCode());
-				firstWordList = service.getWords(selectedWordType, genreType);
-				tempList.remove(selectedWordType);
+				sentenceData.remove(0);
+				sentenceData.add(0, service.getWords(selectedWordType, genreType));
+				tempWordTypeList.remove(selectedWordType);
 				break;
 			case RANDOM:
-				int randomIndex = makeRandomIndex(tempList.size());
-				firstWordList = service.getWords(tempList.get(randomIndex), genreType);
-				tempList.remove(randomIndex);
+				randomCount++;
 				break;
 			case NONE:
+				noneCount++;
 				break;
 		}
 
@@ -79,15 +81,15 @@ public class SentenceGenerator {
 			case ADVERB:
 			case ADJECTIVE:
 				WordType selectedWordType = TypeConverter.intToWordType(sentenceGenerateType.getIndexCode());
-				secondWordList = service.getWords(selectedWordType, genreType);
-				tempList.remove(selectedWordType);
+				sentenceData.remove(1);
+				sentenceData.add(1, service.getWords(selectedWordType, genreType));
+				tempWordTypeList.remove(selectedWordType);
 				break;
 			case RANDOM:
-				int randomIndex = makeRandomIndex(tempList.size());
-				secondWordList = service.getWords(tempList.get(randomIndex), genreType);
-				tempList.remove(randomIndex);
+				randomCount++;
 				break;
 			case NONE:
+				noneCount++;
 				break;
 		}
 
@@ -98,15 +100,15 @@ public class SentenceGenerator {
 			case ADVERB:
 			case ADJECTIVE:
 				WordType selectedWordType = TypeConverter.intToWordType(sentenceGenerateType.getIndexCode());
-				thirdWordList = service.getWords(selectedWordType, genreType);
-				tempList.remove(selectedWordType);
+				sentenceData.remove(2);
+				sentenceData.add(2, service.getWords(selectedWordType, genreType));
+				tempWordTypeList.remove(selectedWordType);
 				break;
 			case RANDOM:
-				int randomIndex = makeRandomIndex(tempList.size());
-				thirdWordList = service.getWords(tempList.get(randomIndex), genreType);
-				tempList.remove(randomIndex);
+				randomCount++;
 				break;
 			case NONE:
+				noneCount++;
 				break;
 		}
 
@@ -117,29 +119,62 @@ public class SentenceGenerator {
 			case ADVERB:
 			case ADJECTIVE:
 				WordType selectedWordType = TypeConverter.intToWordType(sentenceGenerateType.getIndexCode());
-				fourthWordList = service.getWords(selectedWordType, genreType);
-				tempList.remove(selectedWordType);
+				sentenceData.remove(3);
+				sentenceData.add(3, service.getWords(selectedWordType, genreType));
+				tempWordTypeList.remove(selectedWordType);
 				break;
 			case RANDOM:
-				int randomIndex = makeRandomIndex(tempList.size());
-				fourthWordList = service.getWords(tempList.get(randomIndex), genreType);
-				tempList.remove(randomIndex);
+				randomCount++;
 				break;
 			case NONE:
+				noneCount++;
 				break;
 		}
 
-		if (firstWordList != null && !firstWordList.isEmpty()) {
-			this.sentenceData.add(firstWordList);
-		}
-		if (secondWordList != null && !secondWordList.isEmpty()) {
-			this.sentenceData.add(secondWordList);
-		}
-		if (thirdWordList != null && !thirdWordList.isEmpty()) {
-			this.sentenceData.add(thirdWordList);
-		}
-		if (fourthWordList != null && !fourthWordList.isEmpty()) {
-			this.sentenceData.add(fourthWordList);
+		if (randomCount > 0 || noneCount > 0) {
+			List<List<Words>> dummyList = new ArrayList<>(sentenceData);
+			if (tempWordTypeList.size() == 1 && noneCount == 0) {
+				for (List<Words> words : sentenceData) {
+					if (words.isEmpty()) {
+						int index = sentenceData.indexOf(words);
+						dummyList.remove(index);
+						dummyList.add(index, service.getWords(tempWordTypeList.get(0), genreType));
+						break;
+					}
+				}
+				tempWordTypeList.clear();
+			} else if (noneCount < tempWordTypeList.size()) {
+				int totalCount = tempWordTypeList.size() - noneCount;
+				List<Integer> insertIndexList = new ArrayList<>();
+				for (int i = 0; i < totalCount; i++) {
+					int randomIndex = 0;
+					if (tempWordTypeList.size() > 1) {
+						randomIndex = makeRandomIndex(tempWordTypeList.size());
+					}
+					int count = 0;
+					for (List<Words> words : sentenceData) {
+						if (words.isEmpty()) {
+							if (!insertIndexList.contains(count)) {
+								insertIndexList.add(count);
+								dummyList.remove(count);
+								dummyList.add(count, service.getWords(tempWordTypeList.get(randomIndex), genreType));
+								break;
+							}
+						}
+						count++;
+					}
+					tempWordTypeList.remove(randomIndex);
+				}
+			}
+
+			sentenceData = new ArrayList<>(dummyList);
+
+			for (List<Words> wordsList : dummyList) {
+				if (wordsList.isEmpty()) {
+					int index = dummyList.indexOf(wordsList);
+					sentenceData.remove(index);
+				}
+			}
 		}
 	}
 
