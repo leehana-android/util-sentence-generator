@@ -84,4 +84,7 @@
 	<string name="navigation_drawer_open">네비게이션열기</string>
 	<string name="title_activity_favorite_view">즐겨찾기 보기</string>
 	<string name="title_activity_settings">설정</string>
+	<string name="db_upload">디비 업로드</string>
+	<string name="empty"/>
+	<string name="title_activity_upload_to_server">서버에 업로드</string>
 </resources>

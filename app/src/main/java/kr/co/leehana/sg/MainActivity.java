@@ -165,6 +165,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		if (id == R.id.action_settings) {
 			intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
+		} else if (id == R.id.action_upload) {
+			intent = new Intent(this, UploadToServer.class);
+			startActivity(intent);
 		}
 
 		return super.onOptionsItemSelected(item);
