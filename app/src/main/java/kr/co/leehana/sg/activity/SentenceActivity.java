@@ -427,10 +427,17 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 
 					String sentenceItemString = Html.toHtml(sentenceItemText);
 					if (sentenceItemString.contains("&#9733;") || sentenceItemString.contains("&#9734;")) {
-						sentenceItemString = sentenceItemString.substring(0, sentenceItemString.lastIndexOf("<p dir=\"ltr\">"));
+						int lastIndex = sentenceItemString.lastIndexOf("<p dir=\"ltr\">");
+						if (lastIndex <= 0) {
+							lastIndex = sentenceItemString.lastIndexOf("<p dir=ltr>");
+						}
+
+						if (lastIndex > 0) {
+							sentenceItemString = sentenceItemString.substring(0, lastIndex);
+						}
 					}
 
-					newFavorite.setSentence(sentenceItemString);
+					newFavorite.setSentence(sentenceItemString.replaceAll("\n", ""));
 					newFavorite.setParentId(favoriteCategory.getId());
 					newFavorite.setRate(ratingValue);
 					newFavorite.setEnabled(true);
@@ -656,7 +663,14 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 						for (Spanned favoriteString : mTempFavoriteList) {
 							String favoriteItemString = Html.toHtml(favoriteString);
 							if (favoriteItemString.contains("&#9733;") || favoriteItemString.contains("&#9734;")) {
-								favoriteItemString = favoriteItemString.substring(0, favoriteItemString.lastIndexOf("<p dir=\"ltr\">"));
+								int lastIndex = favoriteItemString.lastIndexOf("<p dir=\"ltr\">");
+								if (lastIndex <= 0) {
+									lastIndex = favoriteItemString.lastIndexOf("<p dir=ltr>");
+								}
+
+								if (lastIndex > 0) {
+									favoriteItemString = favoriteItemString.substring(0, lastIndex);
+								}
 							}
 
 							if (favoriteItemString.equals(Html.toHtml((Spanned) checkedTextView.getText()))) {
