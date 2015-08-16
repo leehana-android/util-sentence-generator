@@ -20,7 +20,6 @@ import kr.co.leehana.sg.factory.DbHelperFactory;
 import kr.co.leehana.sg.model.WordStructure;
 import kr.co.leehana.sg.service.ISettingService;
 import kr.co.leehana.sg.service.SettingServiceImpl;
-import kr.co.leehana.sg.service.WordServiceImpl;
 import kr.co.leehana.sg.utils.DbUtils;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {

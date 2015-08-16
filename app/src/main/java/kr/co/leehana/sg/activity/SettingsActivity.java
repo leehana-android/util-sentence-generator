@@ -10,8 +10,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import kr.co.leehana.sg.R;
 import kr.co.leehana.sg.adapter.SettingsAdapter;
@@ -122,25 +120,29 @@ public class SettingsActivity extends AppCompatActivity {
 	}
 
 	private void createWordSettingDialog(final int wordSettingIndex) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 		int initIndex = 0;
 		switch (wordSettingIndex) {
 			case AppContext.SETTING_FIRST_WORD_IDX:
 				initIndex = AppContext.getInstance().getSetting().getFirstWordType().getIndexCode();
+				builder.setTitle(R.string.settings_first_word_dialog_title);
 				break;
 			case AppContext.SETTING_SECOND_WORD_IDX:
 				initIndex = AppContext.getInstance().getSetting().getSecondWordType().getIndexCode();
+				builder.setTitle(R.string.settings_second_word_dialog_title);
 				break;
 			case AppContext.SETTING_THIRD_WORD_IDX:
 				initIndex = AppContext.getInstance().getSetting().getThirdWordType().getIndexCode();
+				builder.setTitle(R.string.settings_third_word_dialog_title);
 				break;
 			case AppContext.SETTING_FOURTH_WORD_IDX:
 				initIndex = AppContext.getInstance().getSetting().getFourthWordType().getIndexCode();
+				builder.setTitle(R.string.settings_fourth_word_dialog_title);
 				break;
 
 		}
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.settings_word_dialog_title);
+
 		builder.setCancelable(false);
 		builder.setIcon(R.drawable.settings_icon);
 

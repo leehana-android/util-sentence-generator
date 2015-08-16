@@ -486,8 +486,6 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		// When the given tab is selected, switch to the corresponding page in
 		// the ViewPager.
 		mCurrentTabPosition = tab.getPosition();
-		mViewPager.setCurrentItem(mCurrentTabPosition);
-
 
 		if (mCurrentTabPosition == 1) {
 			mFavoriteFragment = mSectionsPagerAdapter.getItem(tab.getPosition());
@@ -510,6 +508,8 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 				getMenuInflater().inflate(R.menu.menu_sentence, mOptionsMenu);
 			}
 		}
+
+		mViewPager.setCurrentItem(mCurrentTabPosition);
 	}
 
 	@Override

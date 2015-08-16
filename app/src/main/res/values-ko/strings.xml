@@ -100,5 +100,8 @@
 	<string name="settings_second_word_sub">두번째 단어는 (%s) 보여주기</string>
 	<string name="settings_third_word_sub">세번째 단어는 (%s) 보여주기</string>
 	<string name="settings_sentence_count_dialog_title">문장 갯수 선택</string>
-	<string name="settings_word_dialog_title">단어 선택</string>
+	<string name="settings_first_word_dialog_title">첫번째 단어 선택</string>
+	<string name="settings_fourth_word_dialog_title">네번째 단어 선택</string>
+	<string name="settings_second_word_dialog_title">두번째 단어 선택</string>
+	<string name="settings_third_word_dialog_title">세번째 단어 선택</string>
 </resources>

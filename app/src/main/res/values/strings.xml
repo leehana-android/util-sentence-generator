@@ -133,7 +133,11 @@
 	<string name="random">Random</string>
 	<string name="empty_word">Empty</string>
 
-	<string name="settings_word_dialog_title">Word choice</string>
+	<string name="settings_first_word_dialog_title">First word choice</string>
+	<string name="settings_second_word_dialog_title">Second word choice</string>
+	<string name="settings_third_word_dialog_title">Third word choice</string>
+	<string name="settings_fourth_word_dialog_title">Fourth word choice</string>
+
 	<string name="settings_first_word">First word</string>
 	<string name="settings_first_word_sub">Show (%s)</string>
 	<string name="settings_second_word">Second word</string>

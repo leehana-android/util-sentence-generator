@@ -249,7 +249,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		// the ViewPager.
 		currentTabPosition = tab.getPosition();
 
-		mViewPager.setCurrentItem(tab.getPosition());
+
 
 //		Intent intent = new Intent(this, AdjectiveListActivity.class);
 //		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -259,6 +259,8 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 			mFragment = mSectionsPagerAdapter.getItem(tab.getPosition());
 			fragmentTransaction.attach(mFragment);
 //		}
+
+		mViewPager.setCurrentItem(tab.getPosition());
 	}
 
 	@Override

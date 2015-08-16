@@ -14,7 +14,7 @@ public final class SGDatabases {
 	public static final String _T_FAVORITE = "sg_favorite";
 	public static final String _T_HISTORY = "sg_history";
 	public static final String _T_FAVORITE_CATEGORY = "sg_fav_cate";
-	public static final String _T_SETTING = "setting";
+	public static final String _T_SETTING = "sg_setting";
 
 	public static final String _C_WORD = "word";
 	public static final String _C_TYPE = "type";
