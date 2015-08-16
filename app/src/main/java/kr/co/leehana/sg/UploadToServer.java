@@ -14,9 +14,12 @@ import android.widget.Toast;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import kr.co.leehana.sg.utils.DbUtils;
 
@@ -29,7 +32,9 @@ public class UploadToServer extends AppCompatActivity {
 
 	String upLoadServerUri = null;
 
-	/********** File Path *************/
+	/**********
+	 * File Path
+	 *************/
 	final String uploadFilePath = DbUtils.SYSTEM_DB_PATH;
 	final String uploadFileName = "sg.db";
 
@@ -45,7 +50,7 @@ public class UploadToServer extends AppCompatActivity {
 				+ DbUtils.SYSTEM_DB_FULL_PATH + "'");
 
 		/************* Php script path ****************/
-		upLoadServerUri = "http://leehana.co.kr/UploadToServer.php";
+		upLoadServerUri = "http://52.68.183.71/UploadToServer.php";
 		uploadButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -87,7 +92,7 @@ public class UploadToServer extends AppCompatActivity {
 
 			dialog.dismiss();
 
-			Log.e("uploadFile", "Source File not exist :" + uploadFilePath + ""
+			Log.e(AppProfile.TAG, "Source File not exist :" + uploadFilePath + ""
 					+ uploadFileName);
 
 			runOnUiThread(new Runnable() {
@@ -100,12 +105,19 @@ public class UploadToServer extends AppCompatActivity {
 			return 0;
 
 		} else {
+			FileInputStream fileInputStream = null;
 			try {
 
 				// open a URL connection to the Servlet
-				FileInputStream fileInputStream = new FileInputStream(
+				fileInputStream = new FileInputStream(
 						sourceFile);
 				URL url = new URL(upLoadServerUri);
+
+				try {
+					InetAddress address = InetAddress.getByName("52.68.183.71");
+				} catch (UnknownHostException e) {
+					Log.e(AppProfile.TAG, "Exception : " + e.getMessage(), e);
+				}
 
 				// Open a HTTP connection to the URL
 				conn = (HttpURLConnection) url.openConnection();
@@ -153,7 +165,7 @@ public class UploadToServer extends AppCompatActivity {
 				serverResponseCode = conn.getResponseCode();
 				String serverResponseMessage = conn.getResponseMessage();
 
-				Log.i("uploadFile", "HTTP Response is : "
+				Log.i(AppProfile.TAG, "HTTP Response is : "
 						+ serverResponseMessage + ": " + serverResponseCode);
 
 				if (serverResponseCode == 200) {
@@ -162,7 +174,7 @@ public class UploadToServer extends AppCompatActivity {
 						public void run() {
 
 							String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
-									+ " http://www.androidexample.com/media/uploads/"
+									+ " http://leehana.co.kr/"
 									+ uploadFileName;
 
 							messageText.setText(msg);
@@ -171,13 +183,16 @@ public class UploadToServer extends AppCompatActivity {
 									.show();
 						}
 					});
+				} else if (serverResponseCode == 500) {
+					runOnUiThread(new Runnable() {
+						public void run() {
+
+							String msg = "File Upload Fail.";
+
+							messageText.setText(msg);
+						}
+					});
 				}
-
-				// close the streams //
-				fileInputStream.close();
-				dos.flush();
-				dos.close();
-
 			} catch (MalformedURLException ex) {
 
 				dialog.dismiss();
@@ -208,6 +223,29 @@ public class UploadToServer extends AppCompatActivity {
 					}
 				});
 				Log.e(AppProfile.TAG, "Exception : " + e.getMessage(), e);
+			} finally {
+				// close the streams //
+				try {
+					if (fileInputStream != null) {
+						fileInputStream.close();
+					}
+				} catch (IOException e) {
+					Log.e(AppProfile.TAG, "Exception : " + e.getMessage(), e);
+				}
+				try {
+					if (dos != null) {
+						dos.flush();
+					}
+				} catch (IOException e) {
+					Log.e(AppProfile.TAG, "Exception : " + e.getMessage(), e);
+				}
+				try {
+					if (dos != null) {
+						dos.close();
+					}
+				} catch (IOException e) {
+					Log.e(AppProfile.TAG, "Exception : " + e.getMessage(), e);
+				}
 			}
 			dialog.dismiss();
 			return serverResponseCode;
