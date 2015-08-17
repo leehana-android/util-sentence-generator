@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -169,10 +170,10 @@ public class FavoriteViewActivity extends AppCompatActivity
 			List<Spanned> stringData = new ArrayList<>();
 			if (favoriteList != null) {
 				for (Favorite favorite : favoriteList) {
-					stringData.add(Html.fromHtml(favorite.getSentence()));
+					stringData.add((Spanned) TextUtils.replace(Html.fromHtml(favorite.getSentence()), new String[]{"\n\n"}, new String[]{""}));
 				}
 			}
-			ArrayAdapter<Spanned> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_multiple_choice, stringData);
+			ArrayAdapter<Spanned> adapter = new ArrayAdapter<>(context, R.layout.favorite_view_list_item, stringData);
 			setListAdapter(adapter);
 			View rootView = inflater.inflate(R.layout.fragment_favorite_view, container, false);
 			return rootView;
