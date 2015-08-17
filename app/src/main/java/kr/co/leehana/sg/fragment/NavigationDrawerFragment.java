@@ -61,7 +61,7 @@ public class NavigationDrawerFragment extends Fragment {
 	private ActionBarDrawerToggle mDrawerToggle;
 
 	private DrawerLayout mDrawerLayout;
-	private ListView mDrawerListView;
+	private ListView drawerListView;
 	private View mFragmentContainerView;
 
 	private int mCurrentSelectedPosition = 0;
@@ -73,18 +73,23 @@ public class NavigationDrawerFragment extends Fragment {
 	private boolean isRateView = AppContext.getInstance().isFavoriteRateView();
 	private boolean isCategoryView = AppContext.getInstance().isFavoriteCategoryView();
 
-	private List<FavoriteCategory> mFavoriteCategories;
-	private List<FavoriteRate> mFavoriteRates = new ArrayList<>();
+	private List<FavoriteCategory> favoriteCategories = new ArrayList<>();
+	private List<FavoriteRate> favoriteRates = new ArrayList<>();
+	private List<String> sideMenuTitleList = new ArrayList<>();
 
 	public NavigationDrawerFragment() {
 	}
 
-	public List<FavoriteRate> getmFavoriteRates() {
-		return mFavoriteRates;
+	public List<FavoriteRate> getFavoriteRates() {
+		return favoriteRates;
 	}
 
-	public List<FavoriteCategory> getmFavoriteCategories() {
-		return mFavoriteCategories;
+	public List<FavoriteCategory> getFavoriteCategories() {
+		return favoriteCategories;
+	}
+
+	public ListView getDrawerListView() {
+		return this.drawerListView;
 	}
 
 	@Override
@@ -94,24 +99,7 @@ public class NavigationDrawerFragment extends Fragment {
 		mFavoriteService = FavoriteServiceImpl.getInstance();
 		((FavoriteServiceImpl) mFavoriteService).setHelper(DbHelperFactory.create(getActivity().getBaseContext()));
 
-		if (isCategoryView) {
-			mFavoriteCategories = mFavoriteService.getFavoriteCategories();
-		} else {
-			int favoriteCountInRate5 = mFavoriteService.getFavoriteCountInRate(5);
-			mFavoriteRates.add(new FavoriteRate(5, favoriteCountInRate5));
-
-			int favoriteCountInRate4 = mFavoriteService.getFavoriteCountInRate(4);
-			mFavoriteRates.add(new FavoriteRate(4, favoriteCountInRate4));
-
-			int favoriteCountInRate3 = mFavoriteService.getFavoriteCountInRate(3);
-			mFavoriteRates.add(new FavoriteRate(3, favoriteCountInRate3));
-
-			int favoriteCountInRate2 = mFavoriteService.getFavoriteCountInRate(2);
-			mFavoriteRates.add(new FavoriteRate(2, favoriteCountInRate2));
-
-			int favoriteCountInRate1 = mFavoriteService.getFavoriteCountInRate(1);
-			mFavoriteRates.add(new FavoriteRate(1, favoriteCountInRate1));
-		}
+		initializeFavoriteData();
 
 		// Read in the flag indicating whether or not the user has demonstrated awareness of the
 		// drawer. See PREF_USER_LEARNED_DRAWER for details.
@@ -130,6 +118,43 @@ public class NavigationDrawerFragment extends Fragment {
 		selectItem(mCurrentSelectedPosition);
 	}
 
+	public void initializeFavoriteData() {
+		sideMenuTitleList.clear();
+
+		if (isCategoryView) {
+			favoriteCategories.clear();
+
+			favoriteCategories = mFavoriteService.getFavoriteCategories();
+
+			for (FavoriteCategory category : favoriteCategories) {
+				sideMenuTitleList.add(category.getName() + " (" + mFavoriteService.getFavoriteCountInCategory(category.getId()) + ")");
+			}
+		} else {
+			favoriteRates.clear();
+
+			int favoriteCountInRate5 = mFavoriteService.getFavoriteCountInRate(5);
+			favoriteRates.add(new FavoriteRate(5, favoriteCountInRate5));
+
+			int favoriteCountInRate4 = mFavoriteService.getFavoriteCountInRate(4);
+			favoriteRates.add(new FavoriteRate(4, favoriteCountInRate4));
+
+			int favoriteCountInRate3 = mFavoriteService.getFavoriteCountInRate(3);
+			favoriteRates.add(new FavoriteRate(3, favoriteCountInRate3));
+
+			int favoriteCountInRate2 = mFavoriteService.getFavoriteCountInRate(2);
+			favoriteRates.add(new FavoriteRate(2, favoriteCountInRate2));
+
+			int favoriteCountInRate1 = mFavoriteService.getFavoriteCountInRate(1);
+			favoriteRates.add(new FavoriteRate(1, favoriteCountInRate1));
+
+			sideMenuTitleList.add(AppContext.FAVORITE_RATE[4] + " (" + favoriteRates.get(0).getItemCount() + ")");
+			sideMenuTitleList.add(AppContext.FAVORITE_RATE[3] + " (" + favoriteRates.get(1).getItemCount() + ")");
+			sideMenuTitleList.add(AppContext.FAVORITE_RATE[2] + " (" + favoriteRates.get(2).getItemCount() + ")");
+			sideMenuTitleList.add(AppContext.FAVORITE_RATE[1] + " (" + favoriteRates.get(3).getItemCount() + ")");
+			sideMenuTitleList.add(AppContext.FAVORITE_RATE[0] + " (" + favoriteRates.get(4).getItemCount() + ")");
+		}
+	}
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -138,37 +163,23 @@ public class NavigationDrawerFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	                         Bundle savedInstanceState) {
-		List<String> sideMenuTitleList = new ArrayList<>();
-		if (isCategoryView) {
-			for (FavoriteCategory category : mFavoriteCategories) {
-				sideMenuTitleList.add(category.getName());
-			}
-		} else {
-			sideMenuTitleList.add(AppContext.FAVORITE_RATE[4] + " (" + mFavoriteRates.get(0).getItemCount() + ")");
-			sideMenuTitleList.add(AppContext.FAVORITE_RATE[3] + " (" + mFavoriteRates.get(1).getItemCount() + ")");
-			sideMenuTitleList.add(AppContext.FAVORITE_RATE[2] + " (" + mFavoriteRates.get(2).getItemCount() + ")");
-			sideMenuTitleList.add(AppContext.FAVORITE_RATE[1] + " (" + mFavoriteRates.get(3).getItemCount() + ")");
-			sideMenuTitleList.add(AppContext.FAVORITE_RATE[0] + " (" + mFavoriteRates.get(4).getItemCount() + ")");
-		}
-
-		mDrawerListView = (ListView) inflater.inflate(
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		drawerListView = (ListView) inflater.inflate(
 				R.layout.fragment_navigation_drawer, container, false);
-		mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				selectItem(position);
 			}
 		});
-		mDrawerListView.setAdapter(new ArrayAdapter<String>(
+		drawerListView.setAdapter(new ArrayAdapter<>(
 				getActionBar().getThemedContext(),
 				android.R.layout.simple_list_item_1,
 				android.R.id.text1,
-				sideMenuTitleList.toArray(new String[sideMenuTitleList.size()])
+				sideMenuTitleList
 		));
-		mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-		return mDrawerListView;
+		drawerListView.setItemChecked(mCurrentSelectedPosition, true);
+		return drawerListView;
 	}
 
 	public boolean isDrawerOpen() {
@@ -251,8 +262,8 @@ public class NavigationDrawerFragment extends Fragment {
 
 	private void selectItem(int position) {
 		mCurrentSelectedPosition = position;
-		if (mDrawerListView != null) {
-			mDrawerListView.setItemChecked(position, true);
+		if (drawerListView != null) {
+			drawerListView.setItemChecked(position, true);
 		}
 		if (mDrawerLayout != null) {
 			mDrawerLayout.closeDrawer(mFragmentContainerView);

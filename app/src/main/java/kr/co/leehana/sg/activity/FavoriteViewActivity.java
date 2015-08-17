@@ -2,7 +2,9 @@ package kr.co.leehana.sg.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,8 @@ import kr.co.leehana.sg.context.AppContext;
 import kr.co.leehana.sg.factory.DbHelperFactory;
 import kr.co.leehana.sg.fragment.NavigationDrawerFragment;
 import kr.co.leehana.sg.model.Favorite;
+import kr.co.leehana.sg.model.FavoriteCategory;
+import kr.co.leehana.sg.model.FavoriteRate;
 import kr.co.leehana.sg.service.FavoriteServiceImpl;
 import kr.co.leehana.sg.service.IFavoriteService;
 
@@ -47,6 +52,14 @@ public class FavoriteViewActivity extends AppCompatActivity
 	private int mSelectedCategoryId;
 	private int mSelectedRateCode;
 	private IFavoriteService mFavoriteService;
+	private PlaceholderFragment mFragment;
+	private ArrayAdapter<Spanned> mAdapter;
+	private List<Spanned> mFavoriteSpannedItems = new ArrayList<>();
+	private List<Favorite> mFavoriteList = new ArrayList<>();
+	private int mCurrentSectionNumber = 0;
+
+	private boolean isRateView = AppContext.getInstance().isFavoriteRateView();
+	private boolean isCategoryView = AppContext.getInstance().isFavoriteCategoryView();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,29 +90,28 @@ public class FavoriteViewActivity extends AppCompatActivity
 	@Override
 	public void onNavigationDrawerItemSelected(int position) {
 		// update the main content by replacing fragments
-		PlaceholderFragment fragment = new PlaceholderFragment(position);
+		mFragment = new PlaceholderFragment(position);
 		Bundle args = new Bundle();
 		args.putInt(PlaceholderFragment.ARG_SECTION_NUMBER, position);
-		fragment.setArguments(args);
+		mFragment.setArguments(args);
 
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		fragmentManager.beginTransaction()
-				.replace(R.id.container, fragment)
+				.replace(R.id.container, mFragment)
 				.commit();
 	}
 
 	public void onSectionAttached(int number) {
-		if (AppContext.getInstance().isFavoriteCategoryView()) {
-			mTitle = mNavigationDrawerFragment.getmFavoriteCategories().get(number).getName();
-			mSelectedCategoryId = mNavigationDrawerFragment.getmFavoriteCategories().get(number).getId();
+		mCurrentSectionNumber = number;
+		if (isCategoryView) {
+			FavoriteCategory currentCategory = mNavigationDrawerFragment.getFavoriteCategories().get(number);
+			mSelectedCategoryId = currentCategory.getId();
+			mTitle = currentCategory.getName() + " (" + mFavoriteService.getFavoriteCountInCategory(mSelectedCategoryId) + ")";
 		} else {
-			mTitle = AppContext.FAVORITE_RATE[mNavigationDrawerFragment.getmFavoriteRates().get(number).getRate() - 1] + " (" + mNavigationDrawerFragment.getmFavoriteRates().get(number).getItemCount() + ")";
-			mSelectedRateCode = mNavigationDrawerFragment.getmFavoriteRates().get(number).getRate();
+			FavoriteRate currentRate = mNavigationDrawerFragment.getFavoriteRates().get(number);
+			mSelectedRateCode = currentRate.getRate();
+			mTitle = AppContext.FAVORITE_RATE[currentRate.getRate() - 1] + " (" + currentRate.getItemCount() + ")";
 		}
-	}
-
-	public void onSectionAttached(String title) {
-		mTitle = title;
 	}
 
 	public void restoreActionBar() {
@@ -109,6 +121,9 @@ public class FavoriteViewActivity extends AppCompatActivity
 		actionBar.setTitle(mTitle);
 	}
 
+	private void updateActionBarTitle() {
+		getSupportActionBar().setTitle(mTitle);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -134,9 +149,85 @@ public class FavoriteViewActivity extends AppCompatActivity
 		if (id == R.id.action_settings) {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
+		} else if (id == R.id.action_delete) {
+			showDeleteConfirmAlertDialog();
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void showDeleteConfirmAlertDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.delete_dialog_title);
+		builder.setMessage(R.string.delete_msg);
+		builder.setCancelable(false);
+		builder.setIcon(R.drawable.love_heart_48);
+
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if (mFragment != null && mFragment.getView() != null) {
+					ListView favoriteListView = (ListView) mFragment.getView().findViewById(android.R.id.list);
+					int totalItemCount = mAdapter.getCount();
+
+					List<Spanned> removeTargetIndexList = new ArrayList<>();
+					for (int i = 0; i < totalItemCount; i++) {
+						if (favoriteListView.isItemChecked(i)) {
+							removeTargetIndexList.add(mFavoriteSpannedItems.get(i));
+							favoriteListView.setItemChecked(i, false);
+
+							mFavoriteService.delete(mFavoriteList.get(i));
+						}
+					}
+
+					mFavoriteSpannedItems.removeAll(removeTargetIndexList);
+
+					mAdapter.notifyDataSetChanged();
+					updateFavoriteList();
+					updateFavoriteListInFragment();
+					updateTitle();
+					updateActionBarTitle();
+
+					updateSideMenuItem();
+
+					showToastMessage(getBaseContext(), getString(R.string.delete_done));
+				}
+			}
+		});
+
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+
+		builder.create().show();
+	}
+
+	private void updateFavoriteList() {
+		if (isCategoryView) {
+			mFavoriteList = mFavoriteService.getFavoritesByParentId(mSelectedCategoryId);
+		} else if (isRateView) {
+			mFavoriteList = mFavoriteService.getFavoritesByRate(mSelectedRateCode);
+		}
+	}
+
+	private void updateFavoriteListInFragment() {
+		mNavigationDrawerFragment.initializeFavoriteData();
+	}
+
+	private void updateTitle() {
+		onSectionAttached(mCurrentSectionNumber);
+	}
+
+	private void showToastMessage(Context context, String msg) {
+		Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+	}
+
+	private void updateSideMenuItem() {
+		ArrayAdapter<String> adapter = (ArrayAdapter<String>) mNavigationDrawerFragment.getDrawerListView().getAdapter();
+		adapter.notifyDataSetChanged();
 	}
 
 	/**
@@ -160,21 +251,18 @@ public class FavoriteViewActivity extends AppCompatActivity
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		                         Bundle savedInstanceState) {
 			Context context = getActivity().getBaseContext();
-			List<Favorite> favoriteList = null;
 
-			if (mSelectedCategoryId > -1) {
-				favoriteList = mFavoriteService.getFavoritesByParentId(mSelectedCategoryId);
-			} else if (mSelectedRateCode > -1) {
-				favoriteList = mFavoriteService.getFavoritesByRate(mSelectedRateCode);
-			}
-			List<Spanned> stringData = new ArrayList<>();
-			if (favoriteList != null) {
-				for (Favorite favorite : favoriteList) {
-					stringData.add((Spanned) TextUtils.replace(Html.fromHtml(favorite.getSentence()), new String[]{"\n\n"}, new String[]{""}));
+			updateFavoriteList();
+
+			mFavoriteSpannedItems.clear();
+
+			if (mFavoriteList != null) {
+				for (Favorite favorite : mFavoriteList) {
+					mFavoriteSpannedItems.add((Spanned) TextUtils.replace(Html.fromHtml(favorite.getSentence()), new String[]{"\n\n"}, new String[]{""}));
 				}
 			}
-			ArrayAdapter<Spanned> adapter = new ArrayAdapter<>(context, R.layout.favorite_view_list_item, stringData);
-			setListAdapter(adapter);
+			mAdapter = new ArrayAdapter<>(context, R.layout.favorite_view_list_item, mFavoriteSpannedItems);
+			setListAdapter(mAdapter);
 			View rootView = inflater.inflate(R.layout.fragment_favorite_view, container, false);
 			return rootView;
 		}
