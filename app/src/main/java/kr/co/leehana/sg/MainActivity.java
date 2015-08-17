@@ -8,7 +8,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckedTextView;
+import android.widget.ListAdapter;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import kr.co.leehana.sg.activity.FavoriteCategoriesActivity;
 import kr.co.leehana.sg.activity.InputActivity;
@@ -17,6 +25,7 @@ import kr.co.leehana.sg.activity.SettingsActivity;
 import kr.co.leehana.sg.context.AppContext;
 import kr.co.leehana.sg.converter.TypeConverter;
 import kr.co.leehana.sg.factory.DbHelperFactory;
+import kr.co.leehana.sg.model.Genre;
 import kr.co.leehana.sg.model.WordStructure;
 import kr.co.leehana.sg.service.ISettingService;
 import kr.co.leehana.sg.service.SettingServiceImpl;
@@ -72,6 +81,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		builder.setTitle(R.string.new_word_genre_select_dialog_title);
 		builder.setCancelable(false);
 		builder.setIcon(R.drawable.love_heart_48);
+
+		builder.setAdapter(makeGenreListAdapter(), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				AppContext.getInstance().setGenreType(TypeConverter.intToGenreType(which));
+			}
+		});
 
 		builder.setSingleChoiceItems(R.array.genre_list, 0, new DialogInterface.OnClickListener() {
 			@Override
@@ -142,6 +158,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		});
 
 		generateWordSelectDialog = builder.create();
+	}
+
+	private ListAdapter makeGenreListAdapter() {
+		final List<Genre> genreItems = new ArrayList<>();
+		genreItems.add(new Genre(R.drawable.indi_poetry, getString(R.string.poetry)));
+		genreItems.add(new Genre(R.drawable.indi_nusery_rime, getString(R.string.nursery_rime)));
+		genreItems.add(new Genre(R.drawable.indi_novel, getString(R.string.novel)));
+		genreItems.add(new Genre(R.drawable.indi_essay, getString(R.string.essay)));
+		genreItems.add(new Genre(R.drawable.indi_fairy_tail, getString(R.string.fairy_tale)));
+		genreItems.add(new Genre(R.drawable.indi_star, getString(R.string.etc)));
+
+		return new ArrayAdapter<Genre>(this, android.R.layout.select_dialog_singlechoice, android.R.id.text1, genreItems) {
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View v = super.getView(position, convertView, parent);
+				CheckedTextView tv = (CheckedTextView)v.findViewById(android.R.id.text1);
+
+				//Put the image on the TextView
+				tv.setCompoundDrawablesWithIntrinsicBounds(genreItems.get(position).getIconResourceId(), 0, 0, 0);
+
+				//Add margin between image and text (support various screen densities)
+				int dp5 = (int) (5 * getResources().getDisplayMetrics().density + 0.5f);
+				tv.setCompoundDrawablePadding(dp5);
+
+				return v;
+			}
+		};
 	}
 
 	private void showNoSelectedAlertDialog() {
