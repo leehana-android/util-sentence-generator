@@ -402,11 +402,8 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 
 			if (totalItemCount > 0) {
 
-				String categoryNameSuffix = " (" + totalItemCount + ")";
 				if (StringUtils.isBlank(favoriteCategoryName)) {
-					favoriteCategoryName = getCurrentDateTime() + categoryNameSuffix;
-				} else {
-					favoriteCategoryName += categoryNameSuffix;
+					favoriteCategoryName = getCurrentDateTime();
 				}
 
 				FavoriteCategory favoriteCategory = new FavoriteCategory();

@@ -17,7 +17,11 @@ import java.util.Locale;
 
 import kr.co.leehana.sg.R;
 import kr.co.leehana.sg.context.AppContext;
+import kr.co.leehana.sg.factory.DbHelperFactory;
 import kr.co.leehana.sg.model.FavoriteCategory;
+import kr.co.leehana.sg.service.FavoriteServiceImpl;
+import kr.co.leehana.sg.service.IFavoriteService;
+import kr.co.leehana.sg.utils.DbUtils;
 
 /**
  * Created by Hana Lee on 2015-08-14 23:16
@@ -28,10 +32,13 @@ import kr.co.leehana.sg.model.FavoriteCategory;
 public class FavoriteCategoryAdapter extends ArrayAdapter<FavoriteCategory> {
 
 	private LayoutInflater layoutInflater;
+	private IFavoriteService favoriteService;
 
 	public FavoriteCategoryAdapter(Context context, int resource, List<FavoriteCategory> objects) {
 		super(context, resource, objects);
 		layoutInflater = LayoutInflater.from(context);
+		favoriteService = FavoriteServiceImpl.getInstance();
+		((FavoriteServiceImpl) favoriteService).setHelper(DbHelperFactory.create(context));
 	}
 
 	@SuppressLint("InflateParams")
@@ -81,7 +88,7 @@ public class FavoriteCategoryAdapter extends ArrayAdapter<FavoriteCategory> {
 			holder = (Holder) view.getTag();
 		}
 
-		holder.getName().setText(favoriteCategory.getName());
+		holder.getName().setText(favoriteCategory.getName() + " (" + favoriteService.getFavoriteCountInCategory(favoriteCategory.getId()) + ")");
 		holder.getCreated().setText(getFormattedDateTime(Long.parseLong(favoriteCategory.getCreateDate())));
 
 		return view;
