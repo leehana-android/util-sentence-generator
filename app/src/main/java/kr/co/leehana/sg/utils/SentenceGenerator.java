@@ -209,7 +209,7 @@ public class SentenceGenerator {
 			List<String> newSentence = new ArrayList<>();
 			for (Words words : generatedGrammar) {
 				String wordValue = words.getWord();
-				String colorCode = AppContext.getInstance().getColorCodeForWord(words.getType());
+				String colorCode = AppContext.getColorCodeForWord(words.getType());
 				switch (words.getType()) {
 					case NOUN:
 						wordValue = "<font color='" + colorCode + "'>" + wordValue + "</font>";

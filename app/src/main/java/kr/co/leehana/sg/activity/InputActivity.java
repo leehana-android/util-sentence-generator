@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,6 +16,8 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +26,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -66,12 +71,25 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 	private static final String TAB_TITLE_FORMAT = "%s(%d)";
 
-	private int currentTabPosition = 0;
+	private int mCurrentTabPosition = 0;
+
+	private List<List<Words>> wordsArray = new ArrayList<>();
+	private List<List<Spanned>> wordSpannedArray = new ArrayList<>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_input);
+
+		wordsArray.add(new ArrayList<Words>());
+		wordsArray.add(new ArrayList<Words>());
+		wordsArray.add(new ArrayList<Words>());
+		wordsArray.add(new ArrayList<Words>());
+
+		wordSpannedArray.add(new ArrayList<Spanned>());
+		wordSpannedArray.add(new ArrayList<Spanned>());
+		wordSpannedArray.add(new ArrayList<Spanned>());
+		wordSpannedArray.add(new ArrayList<Spanned>());
 
 		wordService = WordServiceImpl.getInstance();
 		((WordServiceImpl) wordService).setHelper(DbHelperFactory.create(getBaseContext()));
@@ -200,33 +218,42 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 					List<Integer> checkedItemIds = new ArrayList<>();
 					List<Object> checkedItemObjects = new ArrayList<>();
+					List<Words> removeTargetWords = new ArrayList<>();
 					for (int i = 0; i < totalItemCount; i++) {
 						if (wordListView.isItemChecked(i)) {
-							checkedItemObjects.add(wordListView.getItemAtPosition(i));
+							removeTargetWords.add(wordsArray.get(mCurrentTabPosition).get(i));
+							wordSpannedArray.get(mCurrentTabPosition).remove(i);
+
+//							checkedItemObjects.add(wordListView.getItemAtPosition(i));
 							wordListView.setItemChecked(i, false);
-							String selectedItemText = wordListView.getItemAtPosition(i).toString();
-							String selectedItemIdText = selectedItemText.substring(selectedItemText.indexOf("["));
-							String idText = selectedItemIdText.replace("[", "").replace("]", "");
-							checkedItemIds.add(Integer.valueOf(idText));
+//							String selectedItemText = wordListView.getItemAtPosition(i).toString();
+//							String selectedItemIdText = selectedItemText.substring(selectedItemText.indexOf("["));
+//							String idText = selectedItemIdText.replace("[", "").replace("]", "");
+//							checkedItemIds.add(Integer.valueOf(idText));
 						}
 					}
 
-					if (!checkedItemIds.isEmpty()) {
-						wordService.delete(checkedItemIds);
+					if (!removeTargetWords.isEmpty()) {
+						for (Words removeTarget : removeTargetWords) {
+							wordService.delete(removeTarget);
+						}
+
+//						wordService.delete(checkedItemIds);
 
 						showToastMessage(getBaseContext(), "삭제 완료!");
 						ArrayAdapter adapter = (ArrayAdapter) wordListView.getAdapter();
-						for (Object removeTargetObject : checkedItemObjects) {
-							adapter.remove(removeTargetObject);
-						}
+						adapter.notifyDataSetChanged();
+//						for (Object removeTargetObject : checkedItemObjects) {
+//							adapter.remove(removeTargetObject);
+//						}
 
-						int totalWordCount = wordListView.getAdapter().getCount();
+						int totalWordCount = wordSpannedArray.get(mCurrentTabPosition).size();
 
 						Locale l = Locale.getDefault();
-						WordType showWordType = TypeConverter.intToWordType(currentTabPosition);
+						WordType showWordType = TypeConverter.intToWordType(mCurrentTabPosition);
 						String newTabTitle = String.format(l, TAB_TITLE_FORMAT, getString(showWordType.getStringCode()).toUpperCase(l), totalWordCount);
 
-						tabs.get(currentTabPosition).setText(newTabTitle);
+						tabs.get(mCurrentTabPosition).setText(newTabTitle);
 					}
 				}
 			}
@@ -247,7 +274,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 		// When the given tab is selected, switch to the corresponding page in
 		// the ViewPager.
-		currentTabPosition = tab.getPosition();
+		mCurrentTabPosition = tab.getPosition();
 
 
 
@@ -349,25 +376,42 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-		                         Bundle savedInstanceState) {
-			final List<Words> wordsList;
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			WordType currentWordType = TypeConverter.intToWordType(position);
 
-			if (inputType.equals(InputType.NEW)) {
-				wordsList = Collections.emptyList();
-			} else {
-				AppContext appContext = AppContext.getInstance();
-				wordsList = wordService.getWords(TypeConverter.intToWordType(position), appContext.getGenreType());
+			if (wordsArray.get(position).isEmpty()){
+				List<Words> wordsList;
+				if (inputType.equals(InputType.NEW)) {
+					wordsList = new ArrayList<>();
+				} else {
+					AppContext appContext = AppContext.getInstance();
+					wordsList = wordService.getWords(currentWordType, appContext.getGenreType());
+				}
+
+				wordsArray.remove(position);
+				wordsArray.add(position, wordsList);
 			}
 
-			List<String> wordStringList = new ArrayList<>();
-			for (Words words : wordsList) {
-				wordStringList.add(words.getWord() + " ["+words.getId()+"]");
+			if (wordSpannedArray.get(position).isEmpty()) {
+				List<String> sortTargetString = new ArrayList<>();
+				for (Words words : wordsArray.get(position)) {
+					sortTargetString.add(words.getWord() + " [" + words.getId() + "]");
+				}
+
+				Collections.sort(sortTargetString);
+
+				List<Spanned> wordSpannedList = new ArrayList<>();
+				for (String sortedWordString : sortTargetString) {
+					wordSpannedList.add(convertStringToSpanned(sortedWordString, currentWordType));
+				}
+
+				wordSpannedArray.remove(position);
+				wordSpannedArray.add(position, wordSpannedList);
+
+				sortTargetString.clear();
 			}
 
-			Collections.sort(wordStringList);
-
-			final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity().getBaseContext(), R.layout.word_list_item, wordStringList);
+			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<>(getActivity().getBaseContext(), R.layout.word_list_item, wordSpannedArray.get(position));
 			setListAdapter(adapter);
 			View view = inflater.inflate(R.layout.word_list, container, false);
 
@@ -392,7 +436,13 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 						wordService.insert(newWords);
 
 						showToastMessage(getBaseContext(), "단어 생성 완료!");
-						adapter.insert(wordInput.getText().toString() + " [" + newWords.getId() + "]", 0);
+
+						wordsArray.get(position).add(0, newWords);
+
+						Spanned newSpannedWord = convertStringToSpanned(wordInput.getText().toString() + " [" + newWords.getId() + "]", newWords.getType());
+						wordSpannedArray.get(position).add(0, newSpannedWord);
+
+						//adapter.insert(wordSpannedArray.get(position).get(0), 0);
 						adapter.notifyDataSetChanged();
 
 						int totalWordCount = adapter.getCount();
@@ -409,6 +459,10 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 			return view;
 		}
 
+		private Spanned convertStringToSpanned(String source, WordType wordType) {
+			return Html.fromHtml("<font color='" + AppContext.getColorCodeForWord(wordType) + "'>" + source + "</font>");
+		}
+
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -420,6 +474,16 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
+
+			CheckedTextView checkedTextView = (CheckedTextView) l.getChildAt(position);
+
+			if (!AppContext.isGingerBread()) {
+				if (checkedTextView.isChecked()) {
+					v.setBackgroundColor(AppContext.SELECTED_ROW_COLOR);
+				} else {
+					v.setBackgroundColor(Color.TRANSPARENT);
+				}
+			}
 
 			InputMethodManager mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			mInputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);

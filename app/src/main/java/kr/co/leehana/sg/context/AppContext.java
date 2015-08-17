@@ -24,6 +24,7 @@ public class AppContext {
 	public static final String RATE_CODE = "r_code";
 	public static final int ACTION_BAR_COLOR = Color.rgb(255, 102, 0); //blaze orange
 	public static final int ACTION_BAR_TAB_COLOR = Color.rgb(8, 157, 227); //blaze orange
+	public static final int SELECTED_ROW_COLOR = Color.parseColor("#DCF4FD");
 	public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm";
 	public static final String [] FAVORITE_RATE = {"★☆☆☆☆","★★☆☆☆","★★★☆☆","★★★★☆","★★★★★"};
 	public static final int SETTING_SENTENCE_COUNT_IDX = 0;
@@ -62,7 +63,7 @@ public class AppContext {
 		return context;
 	}
 
-	public String getColorCodeForWord(WordType wordType) {
+	public static String getColorCodeForWord(WordType wordType) {
 		switch (wordType) {
 			case NOUN:
 				return "#CD812B";

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -608,7 +609,6 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		 */
 		private static final String ARG_SECTION_NUMBER = "section_number";
 		private int currentPosition;
-		private CheckedTextView checkedTextView;
 
 		public PlaceholderFragment(int currentPosition) {
 			this.currentPosition = currentPosition;
@@ -640,10 +640,8 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		@Override
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
-
+			CheckedTextView checkedTextView = (CheckedTextView) v;
 			if (currentPosition == 0 && v.getId() == R.id.generated_list_item) {
-				CheckedTextView checkedTextView = (CheckedTextView) v;
-
 				boolean checked = AppContext.isGingerBread() ? !checkedTextView.isChecked() : checkedTextView.isChecked();
 
 				if (checked) {
@@ -668,6 +666,14 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 				}
 
 				updateFavoriteTabTitle();
+			}
+
+			if (!AppContext.isGingerBread()) {
+				if (checkedTextView.isChecked()) {
+					v.setBackgroundColor(AppContext.SELECTED_ROW_COLOR);
+				} else {
+					v.setBackgroundColor(Color.TRANSPARENT);
+				}
 			}
 		}
 	}

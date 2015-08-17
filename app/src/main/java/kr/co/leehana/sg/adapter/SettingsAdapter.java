@@ -116,7 +116,7 @@ public class SettingsAdapter extends ArrayAdapter<Setting> {
 		} else if (generateType.equals(SentenceGenerateType.NONE)) {
 			return "#447093";
 		}
-		return AppContext.getInstance().getColorCodeForWord(TypeConverter.intToWordType(generateType.getIndexCode()));
+		return AppContext.getColorCodeForWord(TypeConverter.intToWordType(generateType.getIndexCode()));
 	}
 
 	private class SettingHolder {
