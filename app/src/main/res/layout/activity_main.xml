@@ -12,14 +12,14 @@
 
 	<TextView
 		android:text="@string/first_title"
-		android:layout_width="fill_parent"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
         android:id="@+id/first_title"
         android:textSize="34sp"
         android:gravity="center_vertical|center_horizontal"/>
 
     <Button
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/show_word_input"
         android:id="@+id/btn_show_word"
@@ -27,7 +27,7 @@
         android:layout_alignParentLeft="true"/>
 
     <Button
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/show_favorite"
         android:id="@+id/btn_show_favorite"
@@ -35,7 +35,7 @@
         android:layout_alignParentLeft="true"/>
 
     <Button
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/new_word_input"
         android:id="@+id/btn_new_word_input"
@@ -45,7 +45,7 @@
         android:layout_marginTop="47dp"/>
 
     <Button
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/generate"
         android:id="@+id/btn_generate"
