@@ -367,7 +367,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 			Collections.sort(wordStringList);
 
-			final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity().getBaseContext(), android.R.layout.simple_list_item_multiple_choice, wordStringList);
+			final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity().getBaseContext(), R.layout.word_list_item, wordStringList);
 			setListAdapter(adapter);
 			View view = inflater.inflate(R.layout.word_list, container, false);
 
