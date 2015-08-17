@@ -1,6 +1,7 @@
 package kr.co.leehana.sg.context;
 
 import android.graphics.Color;
+import android.os.Build;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +75,10 @@ public class AppContext {
 		}
 
 		return "";
+	}
+
+	public static boolean isGingerBread() {
+		return Build.VERSION.SDK_INT == Build.VERSION_CODES.GINGERBREAD_MR1;
 	}
 
 	public Setting getSetting() {
