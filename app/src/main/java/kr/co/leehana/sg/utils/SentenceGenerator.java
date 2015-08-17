@@ -228,7 +228,8 @@ public class SentenceGenerator {
 				newSentence.add(wordValue);
 			}
 
-			grammarData.add(Html.fromHtml(TextUtils.join(" ", newSentence)));
+			Spanned newSpannedWord = Html.fromHtml(TextUtils.join(" ", newSentence));
+			grammarData.add(newSpannedWord);
 		}
 
 		return grammarData;

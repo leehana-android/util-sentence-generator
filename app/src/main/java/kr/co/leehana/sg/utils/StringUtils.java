@@ -1,5 +1,8 @@
 package kr.co.leehana.sg.utils;
 
+import android.text.Html;
+import android.text.Spanned;
+
 /**
  * Created by Hana Lee on 2015-08-13 18:46
  *
@@ -107,5 +110,10 @@ public class StringUtils {
 			}
 		}
 		return count;
+	}
+
+	public static String removeStarCharacter(Spanned source) {
+		String sourceString = Html.toHtml(source);
+		return sourceString.replaceAll("&#9733;", "").replaceAll("&#9734;", "").replaceAll("★", "").replaceAll("☆", "");
 	}
 }
