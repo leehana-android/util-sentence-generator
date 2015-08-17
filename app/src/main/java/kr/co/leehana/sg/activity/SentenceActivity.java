@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
@@ -205,16 +206,20 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 			if (getFavoriteItemCount() > 0) {
 				showSaveDialog();
 			} else {
-				showNoItemWarningDialog();
+				showItemNotFoundWarningDialog();
 			}
 		} else if (itemId == R.id.action_delete) {
 			if (getFavoriteItemCount() > 0) {
 				showDeleteConfirmAlertDialog();
 			} else {
-				showNoDeleteItemDialog();
+				showNoSelectSentenceDialog();
 			}
 		} else if (itemId == R.id.action_rate) {
-			showRateDialog();
+			if (getFavoriteItemCount() > 0) {
+				showRateDialog();
+			} else {
+				showNoSelectSentenceDialog();
+			}
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -332,10 +337,10 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		}
 	}
 
-	private void showNoDeleteItemDialog() {
+	private void showNoSelectSentenceDialog() {
 		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 		alertDialog.setTitle(R.string.warning_title);
-		alertDialog.setMessage(getString(R.string.no_delete_item));
+		alertDialog.setMessage(getString(R.string.no_select_sentence));
 		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -345,7 +350,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		alertDialog.show();
 	}
 
-	private void showNoItemWarningDialog() {
+	private void showItemNotFoundWarningDialog() {
 		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 		alertDialog.setTitle(R.string.warning_title);
 		alertDialog.setMessage(getString(R.string.no_favorite_item));
@@ -617,6 +622,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		 */
 		private static final String ARG_SECTION_NUMBER = "section_number";
 		private int currentPosition;
+		private CheckedTextView checkedTextView;
 
 		public PlaceholderFragment(int currentPosition) {
 			this.currentPosition = currentPosition;
@@ -634,9 +640,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 				updateFavoriteTabTitle();
 			}
 
-			View rootView = inflater.inflate(R.layout.fragment_sentence, container, false);
-
-			return rootView;
+			return inflater.inflate(R.layout.fragment_sentence, container, false);
 		}
 
 		@Override
@@ -654,7 +658,9 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 			if (currentPosition == 0 && v.getId() == R.id.generated_list_item) {
 				CheckedTextView checkedTextView = (CheckedTextView) v;
 
-				if (checkedTextView.isChecked()) {
+				boolean checked = AppContext.isGingerBread() ? !checkedTextView.isChecked() : checkedTextView.isChecked();
+
+				if (checked) {
 					Spanned spannedText = (Spanned) checkedTextView.getText();
 					mTempFavoriteList.add(spannedText);
 				} else {

@@ -109,6 +109,7 @@
 	<string name="favorite_category_rate_tab_title">Rate group (%s)</string>
 	<string name="delete_done">Delete done</string>
 	<string name="no_delete_item">Delete item not found</string>
+	<string name="no_select_sentence">Please item select</string>
 	<string name="count_pattern">(%s)</string>
 
 	<string name="title_activity_favorite_view">Favorite view</string>
