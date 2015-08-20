@@ -84,9 +84,9 @@
 	<string name="navigation_drawer_open">네비게이션열기</string>
 	<string name="title_activity_favorite_view">즐겨찾기 보기</string>
 	<string name="title_activity_settings">설정</string>
-	<string name="db_upload">디비 업로드</string>
+	<string name="db_manager">데이터베이스 관리</string>
 	<string name="empty"/>
-	<string name="title_activity_upload_to_server">서버에 업로드</string>
+	<string name="title_activity_database_manager">서버에 업로드</string>
 	<string name="random">무작위</string>
 	<string name="settings_first_word">첫번째 단어</string>
 	<string name="settings_fourth_word">네번째 단어</string>
@@ -105,4 +105,24 @@
 	<string name="settings_second_word_dialog_title">두번째 단어 선택</string>
 	<string name="settings_third_word_dialog_title">세번째 단어 선택</string>
 	<string name="no_select_sentence">문장을 선택해주세요</string>
+	<string name="db_backup_fail">데이터베이스 백업 실패</string>
+	<string name="db_local_backup">데이터베이스 로컬 백업</string>
+	<string name="db_local_backup_complete">데이터베이스 로컬 백업 성공 : %s</string>
+	<string name="db_local_backup_fail">데이터베이스 로컬 백업 실패</string>
+	<string name="db_upgrade">데이터베이스 업그레이드</string>
+	<string name="db_upload_complete">데이터베이스 서버 업로드 성공 : %s</string>
+	<string name="db_upload_fail">데이터베이스 서버 업로드 실패 : %s</string>
+	<string name="db_upload_start">데이터베이스 업로드 시작…</string>
+	<string name="exception_msg">오류 메세지 (%s) : Logcat 확인하세요</string>
+	<string name="progress_upgrade_db">데이터베이스 업그레이드 진행중…</string>
+	<string name="progress_upload_db">데이터베이스 업로드 진행중…</string>
+	<string name="source_file_not_exist">원본 파일이 존재하지 않습니다 : %s</string>
+	<string name="start_db_local_backup">데이터베이스 로컬 백업 시작 : %s</string>
+	<string name="start_db_upgrade">데이터베이스 업그레이드(다운로드) 시작 : %s</string>
+	<string name="start_db_upload">서버 업로드 데이터베이스 파일 위치 : %s</string>
+	<string name="upload_db_file">데이터베이스 업로드</string>
+	<string name="db_upload">데이터베이스 서버 업로드</string>
+	<string name="db_upgrade_complete">데이터베이스 업그레이드 성공</string>
+	<string name="network_error">네트워크 오류 : %s</string>
+	<string name="db_upgrade_fail">데이터베이스 업그레이드 실패 : %s</string>
 </resources>

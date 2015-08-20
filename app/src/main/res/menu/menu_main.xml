@@ -9,7 +9,7 @@
 	      app:showAsAction="ifRoom"/>
 
 	<item android:id="@+id/action_upload"
-	      android:title="@string/db_upload"
+	      android:title="@string/db_manager"
 	      android:orderInCategory="100"
 	      app:showAsAction="never"/>
 </menu>

@@ -3,6 +3,7 @@
     package="kr.co.leehana.sg" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -35,8 +36,8 @@
             android:label="@string/title_activity_favorite_view" >
         </activity>
         <activity
-            android:name=".UploadToServer"
-            android:label="@string/title_activity_upload_to_server" >
+            android:name=".activity.DBManagerActivity"
+            android:label="@string/title_activity_database_manager" >
         </activity>
         <activity
             android:name=".activity.SettingsActivity"

@@ -13,11 +13,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ListAdapter;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import kr.co.leehana.sg.activity.DBManagerActivity;
 import kr.co.leehana.sg.activity.FavoriteCategoriesActivity;
 import kr.co.leehana.sg.activity.InputActivity;
 import kr.co.leehana.sg.activity.SentenceActivity;
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 			intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 		} else if (id == R.id.action_upload) {
-			intent = new Intent(this, UploadToServer.class);
+			intent = new Intent(this, DBManagerActivity.class);
 			startActivity(intent);
 		}
 

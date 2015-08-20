@@ -28,22 +28,24 @@ public class DbUtils {
 	public static final String SYSTEM_DB_FULL_PATH = SYSTEM_DB_PATH + SGSQLiteDbHelper.DATABASE_NAME;
 
 	private static DbUtils instance = new DbUtils();
+
 	public static DbUtils getInstance() {
 		return instance;
 	}
-	private DbUtils() {}
+
+	private DbUtils() {
+	}
 
 	public void prepareDatabase(Context context) {
 		boolean bResult = isDatabaseExistOnSystemFolder();  // DB가 있는지?
 		if (!bResult) {   // DB가 없으면 복사
 			copyDatabaseToSystemFolder(context);
 		}
-//		copyDatabaseToSystemFolder(context);
+		copyDatabaseToSystemFolder(context);
 	}
 
 	private boolean isDatabaseExistOnSystemFolder() {
 		return new File(SYSTEM_DB_FULL_PATH).exists();
-
 	}
 
 	private void copyDatabaseToSystemFolder(Context context) {
@@ -109,5 +111,66 @@ public class DbUtils {
 				}
 			}
 		}
+	}
+
+	public void localBackup(String backupFileName, Context context) {
+		AssetManager manager = context.getAssets();
+
+		File file = new File(SYSTEM_DB_PATH + backupFileName);
+
+		FileOutputStream fos = null;
+		BufferedOutputStream bos = null;
+		InputStream is = null;
+		BufferedInputStream bis = null;
+		try {
+			is = manager.open(SGSQLiteDbHelper.DATABASE_NAME);
+			bis = new BufferedInputStream(is);
+
+			fos = new FileOutputStream(file);
+			bos = new BufferedOutputStream(fos);
+			int read;
+			byte[] buffer = new byte[1024];
+			while ((read = bis.read(buffer, 0, 1024)) != -1) {
+				bos.write(buffer, 0, read);
+			}
+
+			bos.flush();
+		} catch (IOException e) {
+			Log.e(AppProfile.TAG, e.getMessage(), e);
+		} finally {
+			if (bos != null) {
+				try {
+					bos.close();
+				} catch (IOException e) {
+					Log.e(AppProfile.TAG, e.getMessage(), e);
+				}
+			}
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+					Log.e(AppProfile.TAG, e.getMessage(), e);
+				}
+			}
+			if (bis != null) {
+				try {
+					bis.close();
+				} catch (IOException e) {
+					Log.e(AppProfile.TAG, e.getMessage(), e);
+				}
+			}
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					Log.e(AppProfile.TAG, e.getMessage(), e);
+				}
+			}
+		}
+	}
+
+	public boolean checkBackupFile(String backupFileName) {
+		File backupFile = new File(SYSTEM_DB_PATH + backupFileName);
+		return backupFile.exists();
 	}
 }
