@@ -5,8 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,7 +30,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -222,7 +219,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 					for (int i = 0; i < totalItemCount; i++) {
 						if (wordListView.isItemChecked(i)) {
 							removeTargetWords.add(wordsArray.get(mCurrentTabPosition).get(i));
-							wordSpannedArray.get(mCurrentTabPosition).remove(i);
+//							wordSpannedArray.get(mCurrentTabPosition).remove(i);
 
 //							checkedItemObjects.add(wordListView.getItemAtPosition(i));
 							wordListView.setItemChecked(i, false);
@@ -241,8 +238,14 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 //						wordService.delete(checkedItemIds);
 
 						showToastMessage(getBaseContext(), "삭제 완료!");
-						ArrayAdapter adapter = (ArrayAdapter) wordListView.getAdapter();
-						adapter.notifyDataSetChanged();
+
+						initializeWordData(mCurrentTabPosition);
+
+//						ArrayAdapter adapter = (ArrayAdapter) wordListView.getAdapter();
+						wordListView.invalidate();
+						wordListView.setAdapter(createInputAdapter(getBaseContext(), mCurrentTabPosition));
+
+//						adapter.notifyDataSetChanged();
 //						for (Object removeTargetObject : checkedItemObjects) {
 //							adapter.remove(removeTargetObject);
 //						}
@@ -377,42 +380,8 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			WordType currentWordType = TypeConverter.intToWordType(position);
-
-			if (wordsArray.get(position).isEmpty()){
-				List<Words> wordsList;
-				if (inputType.equals(InputType.NEW)) {
-					wordsList = new ArrayList<>();
-				} else {
-					AppContext appContext = AppContext.getInstance();
-					wordsList = wordService.getWords(currentWordType, appContext.getGenreType());
-				}
-
-				wordsArray.remove(position);
-				wordsArray.add(position, wordsList);
-			}
-
-			if (wordSpannedArray.get(position).isEmpty()) {
-				List<String> sortTargetString = new ArrayList<>();
-				for (Words words : wordsArray.get(position)) {
-					sortTargetString.add(words.getWord() + " [" + words.getId() + "]");
-				}
-
-				Collections.sort(sortTargetString);
-
-				List<Spanned> wordSpannedList = new ArrayList<>();
-				for (String sortedWordString : sortTargetString) {
-					wordSpannedList.add(convertStringToSpanned(sortedWordString, currentWordType));
-				}
-
-				wordSpannedArray.remove(position);
-				wordSpannedArray.add(position, wordSpannedList);
-
-				sortTargetString.clear();
-			}
-
-			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<>(getActivity().getBaseContext(), R.layout.word_list_item, wordSpannedArray.get(position));
-			setListAdapter(adapter);
+			InputAdapter inputAdapter = createInputAdapter(getActivity().getBaseContext(), position);
+			setListAdapter(inputAdapter);
 			View view = inflater.inflate(R.layout.word_list, container, false);
 
 			wordInput = (EditText) view.findViewById(R.id.word_input);
@@ -439,10 +408,11 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 						wordsArray.get(position).add(0, newWords);
 
-						Spanned newSpannedWord = convertStringToSpanned(wordInput.getText().toString() + " [" + newWords.getId() + "]", newWords.getType());
+						Spanned newSpannedWord = convertStringToSpanned("0. " + wordInput.getText().toString() + " [" + newWords.getId() + "]", newWords.getType());
 						wordSpannedArray.get(position).add(0, newSpannedWord);
 
 						//adapter.insert(wordSpannedArray.get(position).get(0), 0);
+						InputAdapter adapter = (InputAdapter) getListView().getAdapter();
 						adapter.notifyDataSetChanged();
 
 						int totalWordCount = adapter.getCount();
@@ -459,10 +429,6 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 			return view;
 		}
 
-		private Spanned convertStringToSpanned(String source, WordType wordType) {
-			return Html.fromHtml("<font color='" + AppContext.getColorCodeForWord(wordType) + "'>" + source + "</font>");
-		}
-
 		@Override
 		public void onStart() {
 			super.onStart();
@@ -475,19 +441,99 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		public void onListItemClick(ListView l, View v, int position, long id) {
 			super.onListItemClick(l, v, position, id);
 
-			CheckedTextView checkedTextView = (CheckedTextView) l.getChildAt(position);
-
-			if (!AppContext.isGingerBread()) {
-				if (checkedTextView.isChecked()) {
-					v.setBackgroundColor(AppContext.SELECTED_ROW_COLOR);
-				} else {
-					v.setBackgroundColor(Color.TRANSPARENT);
-				}
-			}
-
 			InputMethodManager mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			mInputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 		}
+	}
+
+	private InputAdapter createInputAdapter(Context context, int position) {
+		initializeWordData(position);
+
+//			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<>(getActivity().getBaseContext(), R.layout.word_list_item, wordSpannedArray.get(position));
+		return new InputAdapter(context, R.layout.word_list_item, wordSpannedArray.get(position));
+	}
+
+	class InputAdapter extends ArrayAdapter<Spanned> {
+
+		private LayoutInflater layoutInflater;
+
+		public InputAdapter(Context context, int resource, List<Spanned> objects) {
+			super(context, resource, objects);
+			layoutInflater = LayoutInflater.from(context);
+		}
+
+		@SuppressLint("InflateParams")
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			Holder holder;
+
+			Spanned item = getItem(position);
+
+			if (view == null) {
+				view = layoutInflater.inflate(R.layout.word_list_item, null);
+				CheckedTextView checkedTextView = (CheckedTextView) view.findViewById(R.id.generated_list_item);
+
+				holder = new Holder();
+				holder.setCheckedTextView(checkedTextView);
+				view.setTag(holder);
+			} else {
+				holder = (Holder) view.getTag();
+			}
+
+			holder.getCheckedTextView().setText(item);
+
+			return view;
+		}
+
+		class Holder {
+			private CheckedTextView checkedTextView;
+
+			public Holder() {}
+
+			public CheckedTextView getCheckedTextView() {
+				return checkedTextView;
+			}
+
+			public void setCheckedTextView(CheckedTextView checkedTextView) {
+				this.checkedTextView = checkedTextView;
+			}
+		}
+	}
+
+	private void initializeWordData(int position) {
+		WordType currentWordType = TypeConverter.intToWordType(position);
+
+		List<Words> wordsList;
+		if (inputType.equals(InputType.NEW)) {
+			wordsList = new ArrayList<>();
+		} else {
+			AppContext appContext = AppContext.getInstance();
+			wordsList = wordService.getWords(currentWordType, appContext.getGenreType());
+		}
+
+		wordsArray.remove(position);
+		wordsArray.add(position, wordsList);
+
+		List<String> sortTargetString = new ArrayList<>();
+		int count = 1;
+		for (Words words : wordsArray.get(position)) {
+			sortTargetString.add(count++ + ". " + words.getWord() + " [" + words.getId() + "]");
+		}
+
+		List<Spanned> wordSpannedList = new ArrayList<>();
+		for (String sortedWordString : sortTargetString) {
+			wordSpannedList.add(convertStringToSpanned(sortedWordString, currentWordType));
+		}
+
+		wordSpannedArray.remove(position);
+		wordSpannedArray.add(position, wordSpannedList);
+
+		sortTargetString.clear();
+	}
+
+	private Spanned convertStringToSpanned(String source, WordType wordType) {
+		return Html.fromHtml("<font color='" + AppContext.getColorCodeForWord(wordType) + "'>" + source + "</font>");
 	}
 
 	private void showToastMessage(Context context, String msg) {

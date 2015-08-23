@@ -5,6 +5,7 @@
                  android:layout_height="match_parent"
                  android:gravity="center_vertical"
                  android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                 android:background="@drawable/sg_list_item_selector"
                  android:textSize="15sp">
 
 </CheckedTextView>
