@@ -41,7 +41,7 @@ public class DbUtils {
 		if (!bResult) {   // DB가 없으면 복사
 			copyDatabaseToSystemFolder(context);
 		}
-		copyDatabaseToSystemFolder(context);
+//		copyDatabaseToSystemFolder(context);
 	}
 
 	private boolean isDatabaseExistOnSystemFolder() {
