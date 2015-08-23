@@ -50,7 +50,7 @@ public class WordServiceImpl implements IWordService {
 		String genreTypeString = String.valueOf(genreType.getIndexCode());
 		String[] whereArgs = new String[] { typeString, genreTypeString };
 
-		String orderBy = SGDatabases._C_C_DATE + " DESC";
+		String orderBy = SGDatabases._C_WORD + "," + SGDatabases._C_C_DATE + " DESC";
 
 		@SuppressLint("Recycle")
 		Cursor c = helper.getRDb().query(SGDatabases._T_WORD, null, whereClause, whereArgs, null, null, orderBy);
