@@ -30,8 +30,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import kr.co.leehana.sg.R;
 import kr.co.leehana.sg.context.AppContext;
@@ -72,6 +74,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 	private List<List<Words>> wordsArray = new ArrayList<>();
 	private List<List<Spanned>> wordSpannedArray = new ArrayList<>();
+	private Map<Integer, ArrayAdapter<Spanned>> mAdapterMap = new HashMap<>(4);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -150,6 +153,10 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 			actionBar.addTab(newTab);
 		}
+
+		if (inputType.equals(InputType.OLD)) {
+			initializeWordData();
+		}
 	}
 
 
@@ -213,20 +220,11 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 					ListView wordListView = (ListView) mFragment.getView().findViewById(android.R.id.list);
 					int totalItemCount = wordListView.getAdapter().getCount();
 
-					List<Integer> checkedItemIds = new ArrayList<>();
-					List<Object> checkedItemObjects = new ArrayList<>();
 					List<Words> removeTargetWords = new ArrayList<>();
 					for (int i = 0; i < totalItemCount; i++) {
 						if (wordListView.isItemChecked(i)) {
 							removeTargetWords.add(wordsArray.get(mCurrentTabPosition).get(i));
-//							wordSpannedArray.get(mCurrentTabPosition).remove(i);
-
-//							checkedItemObjects.add(wordListView.getItemAtPosition(i));
 							wordListView.setItemChecked(i, false);
-//							String selectedItemText = wordListView.getItemAtPosition(i).toString();
-//							String selectedItemIdText = selectedItemText.substring(selectedItemText.indexOf("["));
-//							String idText = selectedItemIdText.replace("[", "").replace("]", "");
-//							checkedItemIds.add(Integer.valueOf(idText));
 						}
 					}
 
@@ -235,20 +233,12 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 							wordService.delete(removeTarget);
 						}
 
-//						wordService.delete(checkedItemIds);
-
 						showToastMessage(getBaseContext(), "삭제 완료!");
 
 						initializeWordData(mCurrentTabPosition);
 
-//						ArrayAdapter adapter = (ArrayAdapter) wordListView.getAdapter();
-						wordListView.invalidate();
-						wordListView.setAdapter(createInputAdapter(getBaseContext(), mCurrentTabPosition));
-
-//						adapter.notifyDataSetChanged();
-//						for (Object removeTargetObject : checkedItemObjects) {
-//							adapter.remove(removeTargetObject);
-//						}
+						ArrayAdapter adapter = (ArrayAdapter) wordListView.getAdapter();
+						adapter.notifyDataSetChanged();
 
 						int totalWordCount = wordSpannedArray.get(mCurrentTabPosition).size();
 
@@ -279,16 +269,8 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		// the ViewPager.
 		mCurrentTabPosition = tab.getPosition();
 
-
-
-//		Intent intent = new Intent(this, AdjectiveListActivity.class);
-//		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//		startActivity(intent);
-
-//		if (mFragment == null) {
-			mFragment = mSectionsPagerAdapter.getItem(tab.getPosition());
-			fragmentTransaction.attach(mFragment);
-//		}
+		mFragment = mSectionsPagerAdapter.getItem(tab.getPosition());
+		fragmentTransaction.attach(mFragment);
 
 		mViewPager.setCurrentItem(tab.getPosition());
 	}
@@ -310,7 +292,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-		private List<Fragment> fragments = new ArrayList<>(4);
+		private Map<Integer, Fragment> fragments = new HashMap<>();
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
@@ -321,21 +303,18 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a PlaceholderFragment (defined as a static inner class below).
 
-//			PlaceholderFragment fragment = new PlaceholderFragment(position);
-//			Bundle args = new Bundle();
-//			args.putInt(PlaceholderFragment.ARG_SECTION_NUMBER, position);
-//			fragment.setArguments(args);
-
 			Fragment fragment;
-			if (fragments.isEmpty() || fragments.size() <= position) {
+			if (fragments.containsKey(position)) {
+				fragment = fragments.get(position);
+			} else {
 				fragment = new PlaceholderFragment(position);
 				Bundle args = new Bundle();
 				args.putInt(PlaceholderFragment.ARG_SECTION_NUMBER, position);
 				fragment.setArguments(args);
 
-				fragments.add(fragment);
-			} else {
-				fragment = fragments.get(position);
+				if (!fragments.containsKey(position)) {
+					fragments.put(position, fragment);
+				}
 			}
 
 			return fragment;
@@ -343,7 +322,6 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 		@Override
 		public int getCount() {
-			// Show 3 total pages.
 			return 4;
 		}
 
@@ -373,6 +351,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		private EditText wordInput;
 
 		private int position;
+		private boolean isInitializeAdapter = true;
 
 		public PlaceholderFragment(int position) {
 			this.position = position;
@@ -380,52 +359,54 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			InputAdapter inputAdapter = createInputAdapter(getActivity().getBaseContext(), position);
-			setListAdapter(inputAdapter);
 			View view = inflater.inflate(R.layout.word_list, container, false);
+			if (isInitializeAdapter) {
+				setListAdapter(createInputAdapter(getActivity().getBaseContext(), position));
 
-			wordInput = (EditText) view.findViewById(R.id.word_input);
+				wordInput = (EditText) view.findViewById(R.id.word_input);
 
-			if (inputType.equals(InputType.NEW)) {
-				wordInput.requestFocus();
-			}
-
-			inputButton = (Button) view.findViewById(R.id.btn_word_input);
-			inputButton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if (StringUtils.isNotBlank(wordInput.getText().toString())) {
-						Words newWords = new Words();
-						newWords.setWord(wordInput.getText().toString());
-						newWords.setBackup(false);
-						newWords.setType(TypeConverter.intToWordType(position));
-						newWords.setCreateDate(String.valueOf(System.currentTimeMillis()));
-						newWords.setGenreType(AppContext.getInstance().getGenreType());
-
-						wordService.insert(newWords);
-
-						showToastMessage(getBaseContext(), "단어 생성 완료!");
-
-						wordsArray.get(position).add(0, newWords);
-
-						Spanned newSpannedWord = convertStringToSpanned("0. " + wordInput.getText().toString() + " [" + newWords.getId() + "]", newWords.getType());
-						wordSpannedArray.get(position).add(0, newSpannedWord);
-
-						//adapter.insert(wordSpannedArray.get(position).get(0), 0);
-						InputAdapter adapter = (InputAdapter) getListView().getAdapter();
-						adapter.notifyDataSetChanged();
-
-						int totalWordCount = adapter.getCount();
-
-						Locale l = Locale.getDefault();
-						WordType showWordType = TypeConverter.intToWordType(position);
-						String newTabTitle = String.format(l, TAB_TITLE_FORMAT, getString(showWordType.getStringCode()).toUpperCase(l), totalWordCount);
-
-						tabs.get(position).setText(newTabTitle);
-					}
-					wordInput.setText("");
+				if (inputType.equals(InputType.NEW)) {
+					wordInput.requestFocus();
 				}
-			});
+
+				inputButton = (Button) view.findViewById(R.id.btn_word_input);
+				inputButton.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						if (StringUtils.isNotBlank(wordInput.getText().toString())) {
+							Words newWords = new Words();
+							newWords.setWord(wordInput.getText().toString());
+							newWords.setBackup(false);
+							newWords.setType(TypeConverter.intToWordType(position));
+							newWords.setCreateDate(String.valueOf(System.currentTimeMillis()));
+							newWords.setGenreType(AppContext.getInstance().getGenreType());
+
+							wordService.insert(newWords);
+
+							showToastMessage(getBaseContext(), "단어 생성 완료!");
+
+							wordsArray.get(position).add(0, newWords);
+
+							Spanned newSpannedWord = convertStringToSpanned("0. " + wordInput.getText().toString() + " [" + newWords.getId() + "]", newWords.getType());
+							wordSpannedArray.get(position).add(0, newSpannedWord);
+
+							ArrayAdapter adapter = (ArrayAdapter) getListView().getAdapter();
+							adapter.notifyDataSetChanged();
+
+							int totalWordCount = adapter.getCount();
+
+							Locale l = Locale.getDefault();
+							WordType showWordType = TypeConverter.intToWordType(position);
+							String newTabTitle = String.format(l, TAB_TITLE_FORMAT, getString(showWordType.getStringCode()).toUpperCase(l), totalWordCount);
+
+							tabs.get(position).setText(newTabTitle);
+						}
+						wordInput.setText("");
+					}
+				});
+
+				isInitializeAdapter = false;
+			}
 			return view;
 		}
 
@@ -446,11 +427,16 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		}
 	}
 
-	private InputAdapter createInputAdapter(Context context, int position) {
-		initializeWordData(position);
+	private ArrayAdapter<Spanned> createInputAdapter(Context context, int position) {
+		ArrayAdapter<Spanned> adapter;
+		if (mAdapterMap.containsKey(position)) {
+			adapter = mAdapterMap.get(position);
+		} else {
+			adapter = new InputAdapter(context, R.layout.word_list_item, wordSpannedArray.get(position));
+			mAdapterMap.put(position, adapter);
+		}
 
-//			final ArrayAdapter<Spanned> adapter = new ArrayAdapter<>(getActivity().getBaseContext(), R.layout.word_list_item, wordSpannedArray.get(position));
-		return new InputAdapter(context, R.layout.word_list_item, wordSpannedArray.get(position));
+		return adapter;
 	}
 
 	class InputAdapter extends ArrayAdapter<Spanned> {
@@ -501,35 +487,27 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		}
 	}
 
+	private void initializeWordData() {
+		for (int index = 0; index < 4; index++) {
+			initializeWordData(index);
+		}
+	}
+
 	private void initializeWordData(int position) {
 		WordType currentWordType = TypeConverter.intToWordType(position);
 
-		List<Words> wordsList;
-		if (inputType.equals(InputType.NEW)) {
-			wordsList = new ArrayList<>();
-		} else {
-			AppContext appContext = AppContext.getInstance();
-			wordsList = wordService.getWords(currentWordType, appContext.getGenreType());
-		}
+		List<Words> oldWordList = wordsArray.get(position);
+		oldWordList.clear();
+		AppContext appContext = AppContext.getInstance();
+		oldWordList.addAll(wordService.getWords(currentWordType, appContext.getGenreType()));
 
-		wordsArray.remove(position);
-		wordsArray.add(position, wordsList);
-
-		List<String> sortTargetString = new ArrayList<>();
 		int count = 1;
+		List<Spanned> oldList = wordSpannedArray.get(position);
+		oldList.clear();
 		for (Words words : wordsArray.get(position)) {
-			sortTargetString.add(count++ + ". " + words.getWord() + " [" + words.getId() + "]");
+			oldList.add(convertStringToSpanned(count + ". " + words.getWord() + " [" + words.getId() + "]", currentWordType));
+			count++;
 		}
-
-		List<Spanned> wordSpannedList = new ArrayList<>();
-		for (String sortedWordString : sortTargetString) {
-			wordSpannedList.add(convertStringToSpanned(sortedWordString, currentWordType));
-		}
-
-		wordSpannedArray.remove(position);
-		wordSpannedArray.add(position, wordSpannedList);
-
-		sortTargetString.clear();
 	}
 
 	private Spanned convertStringToSpanned(String source, WordType wordType) {
