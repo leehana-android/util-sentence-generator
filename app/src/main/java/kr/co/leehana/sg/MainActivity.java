@@ -33,7 +33,7 @@ import kr.co.leehana.sg.utils.DbUtils;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-	private Button newWordBtn;
+	private Button wordSyncBtn;
 	private Button showWordBtn;
 
 	private Button favoriteBtn;
@@ -60,8 +60,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 			AppContext.getInstance().setSetting(settingService.getSetting());
 		}
 
-		newWordBtn = (Button) findViewById(R.id.btn_new_word_input);
-		newWordBtn.setOnClickListener(this);
+		wordSyncBtn = (Button) findViewById(R.id.btn_word_sync);
+		wordSyncBtn.setOnClickListener(this);
 
 		showWordBtn = (Button) findViewById(R.id.btn_show_word);
 		showWordBtn.setOnClickListener(this);
@@ -230,10 +230,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	public void onClick(View v) {
 		switch (v.getId()) {
 			case R.id.btn_show_word:
-			case R.id.btn_new_word_input:
 				intent = new Intent(this, InputActivity.class);
 				intent.putExtra(AppContext.BTN_CODE, v.getId());
 				newWordGenreSelectDialog.show();
+				break;
+			case R.id.btn_word_sync:
+				AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+				alertDialog.setTitle(R.string.no_selected_alert_title);
+				alertDialog.setMessage(getString(R.string.msg_coming_soon));
+				alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+				alertDialog.show();
 				break;
 			case R.id.btn_show_favorite:
 				intent = new Intent(this, FavoriteCategoriesActivity.class);

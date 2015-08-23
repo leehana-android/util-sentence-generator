@@ -277,10 +277,11 @@ public class DBManagerActivity extends AppCompatActivity {
 	}
 
 	private int uploadDatabaseFile(String sourceFileUri) {
+		int resultCode = 0;
 		try {
 			if (checkNetworkAdapter()) {
 				checkNetwork();
-				return processUploadDatabase(sourceFileUri);
+				resultCode = processUploadDatabase(sourceFileUri);
 			}
 		} catch (UnknownHostException e) {
 			Log.e(AppProfile.TAG, "Exception : " + e.getMessage(), e);
@@ -292,7 +293,7 @@ public class DBManagerActivity extends AppCompatActivity {
 		}
 
 		mProgressDialog.dismiss();
-		return 0;
+		return resultCode;
 	}
 
 	private int processUploadDatabase(String sourceFileUri) {

@@ -182,4 +182,7 @@
 	<string name="title_modify_word_dialog">Modify</string>
 	<string name="msg_modify_word_dialog">Edit word and press save button</string>
 	<string name="modify_done">Modify done</string>
+
+	<string name="msg_coming_soon">Coming soon.</string>
+	<string name="made_by">Made by Hana Lee\nSince 2015 summer</string>
 </resources>

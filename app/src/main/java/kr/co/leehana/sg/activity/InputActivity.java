@@ -121,7 +121,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 		int extraData = getIntent().getIntExtra(AppContext.BTN_CODE, 0);
 		switch (extraData) {
-			case R.id.btn_new_word_input:
+			case R.id.btn_word_sync:
 				inputType = InputType.NEW;
 				break;
 			case R.id.btn_show_word:

@@ -5,7 +5,7 @@
 	<string name="adjective">형용사</string>
 	<string name="adverb">부사</string>
 	<string name="adverb_input">부사 입력</string>
-	<string name="show_word_input">입력된 단어 보기</string>
+	<string name="show_word_input">단어 보기</string>
 	<string name="delete">삭제</string>
 	<string name="delete_msg">정말 삭제 하시겠습니까? \n삭제된 단어는 복구 할 수 없습니다.</string>
 	<string name="show_favorite">즐겨찾기</string>
@@ -43,7 +43,7 @@
 	<string name="cancel">취소</string>
 	<string name="create">창조!</string>
 	<string name="no_selected_alert_msg">하나 이상 아이템을 선택해주세요</string>
-	<string name="no_selected_alert_title">하늘의 경고</string>
+	<string name="no_selected_alert_title">오빠의 목소리</string>
 	<string name="ok">확인</string>
 	<string name="new_word_genre_select_dialog_title">장르 선택</string>
 	<string name="novel">소설</string>
@@ -129,4 +129,6 @@
 	<string name="modify_done">수정 완료</string>
 	<string name="msg_modify_word_dialog">수정 후 저장 버튼을 눌러주세요.</string>
 	<string name="word_sync">단어 동기화</string>
+	<string name="msg_coming_soon">준비 중입니다.</string>
+	<string name="made_by">2015년 어느 무더운 여름날\n하나님 만듬</string>
 </resources>
