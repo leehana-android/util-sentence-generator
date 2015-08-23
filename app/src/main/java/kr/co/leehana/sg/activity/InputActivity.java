@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
@@ -237,8 +238,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 						initializeWordData(mCurrentTabPosition);
 
-						ArrayAdapter adapter = (ArrayAdapter) wordListView.getAdapter();
-						adapter.notifyDataSetChanged();
+						updateListFragment(wordListView);
 
 						int totalWordCount = wordSpannedArray.get(mCurrentTabPosition).size();
 
@@ -284,6 +284,15 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 	@Override
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+	}
+
+	private void updateListFragment(ListView listView) {
+		if (listView == null) {
+			listView = (ListView) mFragment.getView().findViewById(android.R.id.list);
+		}
+
+		ArrayAdapter adapter = (ArrayAdapter) listView.getAdapter();
+		adapter.notifyDataSetChanged();
 	}
 
 	/**
@@ -416,6 +425,14 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 
 			/** Setting the multiselect choice mode for the listview */
 			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+				@Override
+				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+					showEditWordDialog(position);
+					return false;
+				}
+			});
 		}
 
 		@Override
@@ -425,6 +442,45 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 			InputMethodManager mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			mInputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 		}
+	}
+
+	private void showEditWordDialog(int position) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.title_modify_word_dialog);
+		builder.setCancelable(false);
+		builder.setIcon(R.drawable.love_heart_48);
+		builder.setMessage(R.string.msg_modify_word_dialog);
+
+		final EditText input = new EditText(this);
+		final Words selectedWord = wordsArray.get(mCurrentTabPosition).get(position);
+		input.setText(selectedWord.getWord());
+		input.setSelection(selectedWord.getWord().length());
+		builder.setView(input);
+		builder.setPositiveButton(R.string.save_dialog_ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				selectedWord.setWord(input.getText().toString());
+				updateEditedWord(selectedWord);
+
+				initializeWordData(mCurrentTabPosition);
+				updateListFragment(null);
+
+				showToastMessage(getBaseContext(), getString(R.string.modify_done));
+			}
+		});
+
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+
+		builder.create().show();
+	}
+
+	private void updateEditedWord(Words word) {
+		wordService.update(word);
 	}
 
 	private ArrayAdapter<Spanned> createInputAdapter(Context context, int position) {

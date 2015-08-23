@@ -27,4 +27,6 @@ public interface IWordService {
 	void delete(int id);
 
 	void delete(List<Integer> ids);
+
+	int update(Words word);
 }

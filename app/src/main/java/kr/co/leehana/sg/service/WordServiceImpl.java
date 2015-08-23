@@ -7,13 +7,13 @@ import android.database.Cursor;
 import java.util.ArrayList;
 import java.util.List;
 
-import kr.co.leehana.sg.db.SGDatabases;
-import kr.co.leehana.sg.db.SGSQLiteDbHelper;
-import kr.co.leehana.sg.type.GenreType;
-import kr.co.leehana.sg.type.WordType;
-import kr.co.leehana.sg.model.Words;
 import kr.co.leehana.sg.converter.BoolConverter;
 import kr.co.leehana.sg.converter.TypeConverter;
+import kr.co.leehana.sg.db.SGDatabases;
+import kr.co.leehana.sg.db.SGSQLiteDbHelper;
+import kr.co.leehana.sg.model.Words;
+import kr.co.leehana.sg.type.GenreType;
+import kr.co.leehana.sg.type.WordType;
 
 /**
  * Created by Hana Lee on 2015-08-13 03:32
@@ -126,5 +126,18 @@ public class WordServiceImpl implements IWordService {
 				delete(id);
 			}
 		}
+	}
+
+	@Override
+	public int update(Words word) {
+		String wordIdStringValue = String.valueOf(word.getId());
+		ContentValues updateValue = new ContentValues();
+		updateValue.put(SGDatabases._C_WORD, word.getWord());
+		updateValue.put(SGDatabases._C_TYPE, word.getType().getIndexCode());
+		updateValue.put(SGDatabases._C_C_DATE, word.getCreateDate());
+		updateValue.put(SGDatabases._C_BACKUP, word.isBackup());
+		updateValue.put(SGDatabases._C_GENRE, word.getGenreType().getIndexCode());
+
+		return helper.getWDb().update(SGDatabases._T_WORD, updateValue, SGDatabases.CreateDB._ID + "=?", new String[]{wordIdStringValue});
 	}
 }

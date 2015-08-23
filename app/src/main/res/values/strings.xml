@@ -18,6 +18,7 @@
 	<string name="sentence_count">Sentence count</string>
 
 	<string name="new_word_input">New word input</string>
+	<string name="word_sync">Word sync</string>
 	<string name="show_word_input">Show word</string>
 	<string name="adverb_input">Adverb input</string>
 	<string name="verb_input">Verb input</string>
@@ -177,4 +178,8 @@
 	<string name="db_local_backup_fail">Database backup fail to local assets storage</string>
 
 	<string name="network_error">Network error : %s</string>
+
+	<string name="title_modify_word_dialog">Modify</string>
+	<string name="msg_modify_word_dialog">Edit word and press save button</string>
+	<string name="modify_done">Modify done</string>
 </resources>

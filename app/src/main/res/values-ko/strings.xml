@@ -125,4 +125,8 @@
 	<string name="db_upgrade_complete">데이터베이스 업그레이드 성공</string>
 	<string name="network_error">네트워크 오류 : %s</string>
 	<string name="db_upgrade_fail">데이터베이스 업그레이드 실패 : %s</string>
+	<string name="title_modify_word_dialog">수정</string>
+	<string name="modify_done">수정 완료</string>
+	<string name="msg_modify_word_dialog">수정 후 저장 버튼을 눌러주세요.</string>
+	<string name="word_sync">단어 동기화</string>
 </resources>
