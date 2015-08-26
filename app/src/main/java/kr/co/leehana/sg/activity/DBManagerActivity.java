@@ -178,14 +178,14 @@ public class DBManagerActivity extends AppCompatActivity {
 
 	public String getLocalBackupFileName() {
 		if (StringUtils.isBlank(localBackupFileName)) {
-			this.localBackupFileName = "sg.db_" + System.currentTimeMillis();
+			this.localBackupFileName = DbUtils.LOCAL_DATABASE_NAME + "_" + System.currentTimeMillis();
 		}
 		return localBackupFileName;
 	}
 
 	private boolean localBackup() {
-		DbUtils.getInstance().localBackup(getLocalBackupFileName(), mContext);
-		return DbUtils.getInstance().checkBackupFile(getLocalBackupFileName());
+		DbUtils.localBackup(getLocalBackupFileName(), mContext);
+		return DbUtils.checkBackupFile(getLocalBackupFileName());
 	}
 
 	private int upgradeDatabase(String targetUri) {

@@ -12,5 +12,7 @@ public interface ISettingService {
 
 	Setting getSetting();
 
+	Setting getNoBackupSetting();
+
 	void update(Setting setting);
 }

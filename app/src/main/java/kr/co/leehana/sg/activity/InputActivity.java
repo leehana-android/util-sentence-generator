@@ -45,6 +45,7 @@ import kr.co.leehana.sg.service.IWordService;
 import kr.co.leehana.sg.service.WordServiceImpl;
 import kr.co.leehana.sg.type.InputType;
 import kr.co.leehana.sg.type.WordType;
+import kr.co.leehana.sg.utils.DbUtils;
 import kr.co.leehana.sg.utils.StringUtils;
 
 public class InputActivity extends AppCompatActivity implements ActionBar.TabListener {
@@ -93,7 +94,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		wordSpannedArray.add(new ArrayList<Spanned>());
 
 		wordService = WordServiceImpl.getInstance();
-		((WordServiceImpl) wordService).setHelper(DbHelperFactory.create(getBaseContext()));
+		((WordServiceImpl) wordService).setHelper(DbHelperFactory.create(getBaseContext(), DbUtils.LOCAL_DATABASE_NAME));
 
 		// Set up the action bar.
 		final ActionBar actionBar = getSupportActionBar();
@@ -385,7 +386,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 						if (StringUtils.isNotBlank(wordInput.getText().toString())) {
 							Words newWords = new Words();
 							newWords.setWord(wordInput.getText().toString());
-							newWords.setBackup(false);
+							newWords.setBackup(true);
 							newWords.setType(TypeConverter.intToWordType(position));
 							newWords.setCreateDate(String.valueOf(System.currentTimeMillis()));
 							newWords.setGenreType(AppContext.getInstance().getGenreType());

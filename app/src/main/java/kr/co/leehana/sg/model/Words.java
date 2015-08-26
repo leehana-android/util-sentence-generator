@@ -16,7 +16,7 @@ public class Words {
 	private WordType type;
 	private GenreType genreType;
 	private String createDate;
-	private boolean backup;
+	private boolean backup = true;
 
 	public Words() {
 	}

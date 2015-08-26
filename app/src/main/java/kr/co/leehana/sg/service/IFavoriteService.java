@@ -24,6 +24,8 @@ public interface IFavoriteService {
 
 	List<Favorite> getFavoritesByRate(int rate);
 
+	List<Favorite> getNoBackupFavorite();
+
 	int getFavoriteCountInRate(int rate);
 
 	int getFavoriteCountInCategory(int parentId);
@@ -42,7 +44,11 @@ public interface IFavoriteService {
 
 	List<FavoriteCategory> getFavoriteCategoriesByRate(int rate);
 
+	List<FavoriteCategory> getNoBackupFavoriteCategory();
+
 	void insertCategory(FavoriteCategory category);
+
+	void insertCategory(List<FavoriteCategory> categories);
 
 	void updateCategory(FavoriteCategory category);
 

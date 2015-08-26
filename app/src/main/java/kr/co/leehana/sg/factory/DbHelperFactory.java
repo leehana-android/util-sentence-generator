@@ -12,13 +12,13 @@ import kr.co.leehana.sg.db.SGSQLiteDbHelper;
  */
 public final class DbHelperFactory {
 
-	private static SGSQLiteDbHelper helper;
+//	private static SGSQLiteDbHelper helper;
 
-	public static SGSQLiteDbHelper create(Context context) {
-		if (helper == null) {
-			helper = new SGSQLiteDbHelper(context);
-		}
+	public static SGSQLiteDbHelper create(Context context, String databaseName) {
+//		if (helper == null || !databaseName.equals(helper.getDatabaseName())) {
+			return new SGSQLiteDbHelper(context, databaseName);
+//		}
 
-		return helper;
+//		return helper;
 	}
 }

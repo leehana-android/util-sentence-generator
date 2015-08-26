@@ -47,6 +47,7 @@ import kr.co.leehana.sg.service.IFavoriteService;
 import kr.co.leehana.sg.service.IWordService;
 import kr.co.leehana.sg.service.WordServiceImpl;
 import kr.co.leehana.sg.type.GenreType;
+import kr.co.leehana.sg.utils.DbUtils;
 import kr.co.leehana.sg.utils.SentenceGenerator;
 import kr.co.leehana.sg.utils.StringUtils;
 
@@ -84,9 +85,9 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 		setContentView(R.layout.activity_sentence);
 
 		mFavoriteService = FavoriteServiceImpl.getInstance();
-		((FavoriteServiceImpl) mFavoriteService).setHelper(DbHelperFactory.create(getBaseContext()));
+		((FavoriteServiceImpl) mFavoriteService).setHelper(DbHelperFactory.create(getBaseContext(), DbUtils.LOCAL_DATABASE_NAME));
 		mWordService = WordServiceImpl.getInstance();
-		((WordServiceImpl) mWordService).setHelper(DbHelperFactory.create(getBaseContext()));
+		((WordServiceImpl) mWordService).setHelper(DbHelperFactory.create(getBaseContext(), DbUtils.LOCAL_DATABASE_NAME));
 
 		// Set up the action bar.
 		final ActionBar actionBar = getSupportActionBar();
@@ -410,7 +411,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 				favoriteCategory.setName(favoriteCategoryName);
 				favoriteCategory.setGenreType(AppContext.getInstance().getGenreType());
 				favoriteCategory.setCreateDate(String.valueOf(System.currentTimeMillis()));
-				favoriteCategory.setBackup(false);
+				favoriteCategory.setBackup(true);
 				favoriteCategory.setEnabled(true);
 
 				mFavoriteService.insertCategory(favoriteCategory);
@@ -432,7 +433,7 @@ public class SentenceActivity extends AppCompatActivity implements ActionBar.Tab
 					newFavorite.setParentId(favoriteCategory.getId());
 					newFavorite.setRate(ratingValue);
 					newFavorite.setEnabled(true);
-					newFavorite.setBackup(false);
+					newFavorite.setBackup(true);
 					newFavorite.setGenreType(AppContext.getInstance().getGenreType());
 					newFavorite.setCreateDate(String.valueOf(saveNewFavoriteTime));
 

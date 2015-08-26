@@ -36,6 +36,7 @@ import kr.co.leehana.sg.model.FavoriteCategory;
 import kr.co.leehana.sg.model.FavoriteRate;
 import kr.co.leehana.sg.service.FavoriteServiceImpl;
 import kr.co.leehana.sg.service.IFavoriteService;
+import kr.co.leehana.sg.utils.DbUtils;
 
 public class FavoriteViewActivity extends AppCompatActivity
 		implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -67,7 +68,7 @@ public class FavoriteViewActivity extends AppCompatActivity
 		setContentView(R.layout.activity_favorite_view);
 
 		mFavoriteService = FavoriteServiceImpl.getInstance();
-		((FavoriteServiceImpl) mFavoriteService).setHelper(DbHelperFactory.create(getBaseContext()));
+		((FavoriteServiceImpl) mFavoriteService).setHelper(DbHelperFactory.create(getBaseContext(), DbUtils.LOCAL_DATABASE_NAME));
 
 		mSelectedCategoryId = getIntent().getIntExtra(AppContext.CATEGORY_ID, -1);
 		mSelectedRateCode = getIntent().getIntExtra(AppContext.RATE_CODE, -1);

@@ -31,6 +31,7 @@ import kr.co.leehana.sg.model.FavoriteCategory;
 import kr.co.leehana.sg.model.FavoriteRate;
 import kr.co.leehana.sg.service.FavoriteServiceImpl;
 import kr.co.leehana.sg.service.IFavoriteService;
+import kr.co.leehana.sg.utils.DbUtils;
 
 public class FavoriteCategoriesActivity extends AppCompatActivity implements ActionBar.TabListener {
 
@@ -63,7 +64,7 @@ public class FavoriteCategoriesActivity extends AppCompatActivity implements Act
 		AppContext.getInstance().setIsFavoriteRateView(false);
 
 		mFavoriteService = FavoriteServiceImpl.getInstance();
-		((FavoriteServiceImpl) mFavoriteService).setHelper(DbHelperFactory.create(getBaseContext()));
+		((FavoriteServiceImpl) mFavoriteService).setHelper(DbHelperFactory.create(getBaseContext(), DbUtils.LOCAL_DATABASE_NAME));
 
 		// Set up the action bar.
 		final ActionBar actionBar = getSupportActionBar();

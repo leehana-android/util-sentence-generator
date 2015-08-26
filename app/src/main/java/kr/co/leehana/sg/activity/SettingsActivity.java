@@ -19,6 +19,7 @@ import kr.co.leehana.sg.factory.DbHelperFactory;
 import kr.co.leehana.sg.model.Setting;
 import kr.co.leehana.sg.service.ISettingService;
 import kr.co.leehana.sg.service.SettingServiceImpl;
+import kr.co.leehana.sg.utils.DbUtils;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -41,7 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_settings);
 
 		mSettingService = SettingServiceImpl.getInstance();
-		((SettingServiceImpl) mSettingService).setHelper(DbHelperFactory.create(getBaseContext()));
+		((SettingServiceImpl) mSettingService).setHelper(DbHelperFactory.create(getBaseContext(), DbUtils.LOCAL_DATABASE_NAME));
 
 		mSetting = AppContext.getInstance().getSetting();
 

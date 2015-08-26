@@ -149,6 +149,29 @@ public class FavoriteServiceImpl implements IFavoriteService {
 	}
 
 	@Override
+	public List<Favorite> getNoBackupFavorite() {
+		List<Favorite> favoriteList = new ArrayList<>();
+
+		@SuppressLint("Recycle")
+		Cursor c = helper.getRDb().query(SGDatabases._T_FAVORITE, null, SGDatabases._C_BACKUP + "=?", new String[]{"0"}, null, null, SGDatabases._C_C_DATE + " DESC");
+
+		while(c.moveToNext()) {
+			Favorite favorite = new Favorite();
+			favorite.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			favorite.setParentId(c.getInt(c.getColumnIndex(SGDatabases._C_PARENT)));
+			favorite.setSentence(c.getString(c.getColumnIndex(SGDatabases._C_SENTENCE)));
+			favorite.setRate(c.getInt(c.getColumnIndex(SGDatabases._C_RATE)));
+			favorite.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			favorite.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			favorite.setEnabled(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_ENABLED))));
+			favorite.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
+
+			favoriteList.add(favorite);
+		}
+		return favoriteList;
+	}
+
+	@Override
 	public int getFavoriteCountInRate(int rate) {
 		String whereClause = SGDatabases._C_ENABLED + "=?" + " AND " + SGDatabases._C_RATE + "=?";
 
@@ -270,6 +293,28 @@ public class FavoriteServiceImpl implements IFavoriteService {
 	}
 
 	@Override
+	public List<FavoriteCategory> getNoBackupFavoriteCategory() {
+		List<FavoriteCategory> favoriteCategories = new ArrayList<>();
+
+		@SuppressLint("Recycle")
+		Cursor c = helper.getRDb().query(SGDatabases._T_FAVORITE_CATEGORY, null, SGDatabases._C_BACKUP + "=?", new String[]{"0"}, null, null, SGDatabases._C_C_DATE + " DESC");
+
+		while(c.moveToNext()) {
+			FavoriteCategory favoriteCategory = new FavoriteCategory();
+			favoriteCategory.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			favoriteCategory.setName(c.getString(c.getColumnIndex(SGDatabases._C_NAME)));
+			favoriteCategory.setRate(c.getInt(c.getColumnIndex(SGDatabases._C_RATE)));
+			favoriteCategory.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			favoriteCategory.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			favoriteCategory.setEnabled(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_ENABLED))));
+			favoriteCategory.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
+
+			favoriteCategories.add(favoriteCategory);
+		}
+		return favoriteCategories;
+	}
+
+	@Override
 	public void insertCategory(FavoriteCategory category) {
 		ContentValues newValues = new ContentValues();
 		newValues.put(SGDatabases._C_NAME, category.getName());
@@ -281,6 +326,15 @@ public class FavoriteServiceImpl implements IFavoriteService {
 		long newId = helper.getWDb().insert(SGDatabases._T_FAVORITE_CATEGORY, null, newValues);
 
 		category.setId((int) newId);
+	}
+
+	@Override
+	public void insertCategory(List<FavoriteCategory> categories) {
+		if (categories != null) {
+			for (FavoriteCategory category : categories) {
+				insertCategory(category);
+			}
+		}
 	}
 
 	@Override

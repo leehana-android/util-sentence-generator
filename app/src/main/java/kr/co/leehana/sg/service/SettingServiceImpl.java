@@ -61,6 +61,28 @@ public class SettingServiceImpl implements ISettingService {
 	}
 
 	@Override
+	public Setting getNoBackupSetting() {
+		@SuppressLint("Recycle")
+		Cursor c = helper.getRDb().query(SGDatabases._T_SETTING, null, SGDatabases._C_BACKUP + "=?", new String[]{"0"}, null, null, null);
+
+		Setting setting = null;
+
+		if (c.moveToNext()) {
+			setting = new Setting();
+			setting.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			setting.setSentenceCount(c.getInt(c.getColumnIndex(SGDatabases._C_SENTENCE_COUNT)));
+			setting.setFirstWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_FIRST_TYPE))));
+			setting.setSecondWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_SECOND_TYPE))));
+			setting.setThirdWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_THIRD_TYPE))));
+			setting.setFourthWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_FOURTH_TYPE))));
+			setting.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			setting.setCreated(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+		}
+
+		return setting;
+	}
+
+	@Override
 	public void update(Setting setting) {
 		ContentValues newValues = new ContentValues();
 		newValues.put(SGDatabases._C_SENTENCE_COUNT, setting.getSentenceCount());

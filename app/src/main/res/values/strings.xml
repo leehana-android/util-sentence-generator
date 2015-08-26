@@ -185,4 +185,8 @@
 
 	<string name="msg_coming_soon">Coming soon.</string>
 	<string name="made_by">Made by Hana Lee\nSince 2015 summer</string>
+	<string name="progress_sync_db">Progress Database Sync</string>
+
+	<string name="db_sync_fail">Database Sync Fail</string>
+	<string name="db_sync_complete">Database Sync Complete</string>
 </resources>

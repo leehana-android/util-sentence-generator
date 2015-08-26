@@ -17,7 +17,7 @@ public class FavoriteCategory {
 	private GenreType genreType;
 	private int rate = 1;
 	private String createDate;
-	private boolean backup;
+	private boolean backup = true;
 	private boolean enabled;
 
 	public FavoriteCategory() {

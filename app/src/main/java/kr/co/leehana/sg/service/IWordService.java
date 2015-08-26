@@ -16,6 +16,8 @@ public interface IWordService {
 
 	List<Words> getWords(WordType type, GenreType genreType);
 
+	List<Words> getNoBackupWords();
+
 	int getCount(WordType type, GenreType genreType);
 
 	void insert(Words word);

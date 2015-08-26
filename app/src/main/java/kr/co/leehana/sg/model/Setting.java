@@ -17,7 +17,7 @@ public class Setting {
 	private SentenceGenerateType thirdWordType;
 	private SentenceGenerateType fourthWordType;
 	private String created;
-	private boolean backup;
+	private boolean backup = true;
 
 	public Setting() {
 	}

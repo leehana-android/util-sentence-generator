@@ -70,6 +70,32 @@ public class WordServiceImpl implements IWordService {
 	}
 
 	@Override
+	public List<Words> getNoBackupWords() {
+		List<Words> wordsList = new ArrayList<>();
+		String whereClause = SGDatabases._C_BACKUP + "=?";
+
+		String[] whereArgs = new String[] { "0" };
+
+		String orderBy = SGDatabases._C_WORD + "," + SGDatabases._C_C_DATE + " DESC";
+
+		@SuppressLint("Recycle")
+		Cursor c = helper.getRDb().query(SGDatabases._T_WORD, null, whereClause, whereArgs, null, null, orderBy);
+
+		while (c.moveToNext()) {
+			Words words = new Words();
+			words.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			words.setWord(c.getString(c.getColumnIndex(SGDatabases._C_WORD)));
+			words.setType(TypeConverter.intToWordType(c.getInt(c.getColumnIndex(SGDatabases._C_TYPE))));
+			words.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
+			words.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			words.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+
+			wordsList.add(words);
+		}
+		return wordsList;
+	}
+
+	@Override
 	public int getCount(WordType type, GenreType genreType) {
 		String whereClause = makeSelectWhereClause();
 

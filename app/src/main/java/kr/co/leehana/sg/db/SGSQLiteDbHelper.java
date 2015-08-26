@@ -12,11 +12,11 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class SGSQLiteDbHelper {
 
-	public static final String DATABASE_NAME = "sg.db";
 	private static final int DATABASE_VERSION = 1;
 	private Context context;
 	private SGOpenHelper helper;
 	private SQLiteDatabase db;
+	private String databaseName;
 
 	private class SGOpenHelper extends SQLiteOpenHelper {
 
@@ -42,17 +42,22 @@ public class SGSQLiteDbHelper {
 		}
 	}
 
-	public SGSQLiteDbHelper(Context context) {
+	public SGSQLiteDbHelper(Context context, String databaseName) {
 		this.context = context;
-		makeHelper();
+		this.databaseName = databaseName;
+		makeHelper(databaseName);
 	}
 
-	private SGOpenHelper makeHelper() {
+	private SGOpenHelper makeHelper(String databaseName) {
 		if (this.helper == null) {
-			this.helper = new SGOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION);
+			this.helper = new SGOpenHelper(context, databaseName, null, DATABASE_VERSION);
 		}
 
 		return this.helper;
+	}
+
+	public String getDatabaseName() {
+		return this.databaseName;
 	}
 
 	public SQLiteDatabase getWDb() {

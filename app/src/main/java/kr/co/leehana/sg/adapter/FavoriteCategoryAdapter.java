@@ -2,7 +2,6 @@ package kr.co.leehana.sg.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,7 @@ public class FavoriteCategoryAdapter extends ArrayAdapter<FavoriteCategory> {
 		super(context, resource, objects);
 		layoutInflater = LayoutInflater.from(context);
 		favoriteService = FavoriteServiceImpl.getInstance();
-		((FavoriteServiceImpl) favoriteService).setHelper(DbHelperFactory.create(context));
+		((FavoriteServiceImpl) favoriteService).setHelper(DbHelperFactory.create(context, DbUtils.LOCAL_DATABASE_NAME));
 	}
 
 	@SuppressLint("InflateParams")

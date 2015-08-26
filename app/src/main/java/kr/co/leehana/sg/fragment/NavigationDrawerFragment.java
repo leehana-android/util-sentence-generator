@@ -31,6 +31,7 @@ import kr.co.leehana.sg.model.FavoriteCategory;
 import kr.co.leehana.sg.model.FavoriteRate;
 import kr.co.leehana.sg.service.FavoriteServiceImpl;
 import kr.co.leehana.sg.service.IFavoriteService;
+import kr.co.leehana.sg.utils.DbUtils;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -97,7 +98,7 @@ public class NavigationDrawerFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		mFavoriteService = FavoriteServiceImpl.getInstance();
-		((FavoriteServiceImpl) mFavoriteService).setHelper(DbHelperFactory.create(getActivity().getBaseContext()));
+		((FavoriteServiceImpl) mFavoriteService).setHelper(DbHelperFactory.create(getActivity().getBaseContext(), DbUtils.LOCAL_DATABASE_NAME));
 
 		initializeFavoriteData();
 

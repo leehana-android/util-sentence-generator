@@ -1,10 +1,14 @@
 package kr.co.leehana.sg;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +17,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ListAdapter;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,15 +52,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 	private ISettingService settingService;
 
+	private ProgressDialog mProgressDialog = null;
+	private Context mContext;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		DbUtils.getInstance().prepareDatabase(getBaseContext());
+		mContext = this;
+
+		DbUtils.prepareDatabase(getBaseContext());
 
 		settingService = SettingServiceImpl.getInstance();
-		((SettingServiceImpl) settingService).setHelper(DbHelperFactory.create(getBaseContext()));
+		((SettingServiceImpl) settingService).setHelper(DbHelperFactory.create(getBaseContext(), DbUtils.LOCAL_DATABASE_NAME));
 
 		if (AppContext.getInstance().getSetting() == null) {
 			AppContext.getInstance().setSetting(settingService.getSetting());
@@ -74,6 +85,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 		makeGenerateWordSelectDialog();
 		makeNewWordGenreSelectDialog();
+	}
+
+	private class ProcessDatabaseSyncTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				if (DbUtils.sync(mContext)) {
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							showToastMessage(getString(R.string.db_sync_complete));
+						}
+					});
+				} else {
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							showToastMessage(getString(R.string.db_sync_fail));
+						}
+					});
+				}
+			} catch (Exception e) {
+				Log.e(AppProfile.TAG, "Exception : " + e.getMessage(), e);
+			} finally {
+				mProgressDialog.dismiss();
+			}
+			return null;
+		}
 	}
 
 	private void makeNewWordGenreSelectDialog() {
@@ -235,16 +275,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 				newWordGenreSelectDialog.show();
 				break;
 			case R.id.btn_word_sync:
-				AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-				alertDialog.setTitle(R.string.no_selected_alert_title);
-				alertDialog.setMessage(getString(R.string.msg_coming_soon));
-				alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-							}
-						});
-				alertDialog.show();
+//				AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+//				alertDialog.setTitle(R.string.no_selected_alert_title);
+//				alertDialog.setMessage(getString(R.string.msg_coming_soon));
+//				alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
+//						new DialogInterface.OnClickListener() {
+//							public void onClick(DialogInterface dialog, int which) {
+//								dialog.dismiss();
+//							}
+//						});
+//				alertDialog.show();
+
+				mProgressDialog = ProgressDialog.show(mContext, "", getString(R.string.progress_sync_db), true);
+				new ProcessDatabaseSyncTask().execute(null, null, null);
+//				if (DbUtils.sync(mContext)) {
+//					mProgressDialog.dismiss();
+//					showToastMessage(getString(R.string.db_sync_complete));
+////					runOnUiThread(new Runnable() {
+////						@Override
+////						public void run() {
+////							showToastMessage(getString(R.string.db_sync_complete));
+////						}
+////					});
+//				} else {
+//					mProgressDialog.dismiss();
+//					showToastMessage(getString(R.string.db_sync_fail));
+////					runOnUiThread(new Runnable() {
+////						@Override
+////						public void run() {
+////							showToastMessage(getString(R.string.db_sync_fail));
+////						}
+////					});
+//				}
+
+//				new Thread(new Runnable() {
+//					@Override
+//					public void run() {
+//						if (DbUtils.sync(mContext)) {
+//							mProgressDialog.dismiss();
+//							runOnUiThread(new Runnable() {
+//								@Override
+//								public void run() {
+//									showToastMessage(getString(R.string.db_sync_complete));
+//								}
+//							});
+//						} else {
+//							mProgressDialog.dismiss();
+//							runOnUiThread(new Runnable() {
+//								@Override
+//								public void run() {
+//									showToastMessage(getString(R.string.db_sync_fail));
+//								}
+//							});
+//						}
+//					}
+//				});
 				break;
 			case R.id.btn_show_favorite:
 				intent = new Intent(this, FavoriteCategoriesActivity.class);
@@ -258,5 +343,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 			default:
 				break;
 		}
+	}
+
+	private void showToastMessage(String message) {
+		Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
 	}
 }
