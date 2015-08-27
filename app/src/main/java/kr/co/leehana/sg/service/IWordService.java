@@ -2,7 +2,7 @@ package kr.co.leehana.sg.service;
 
 import java.util.List;
 
-import kr.co.leehana.sg.model.Words;
+import kr.co.leehana.sg.model.Word;
 import kr.co.leehana.sg.type.GenreType;
 import kr.co.leehana.sg.type.WordType;
 
@@ -14,21 +14,21 @@ import kr.co.leehana.sg.type.WordType;
  */
 public interface IWordService {
 
-	List<Words> getWords(WordType type, GenreType genreType);
+	List<Word> getWords(WordType type, GenreType genreType);
 
-	List<Words> getNoBackupWords();
+	List<Word> getNoBackupWords();
 
 	int getCount(WordType type, GenreType genreType);
 
-	void insert(Words word);
+	void insert(Word word);
 
-	void insert(List<Words> wordsList);
+	void insert(List<Word> wordList);
 
-	void delete(Words word);
+	void delete(Word word);
 
 	void delete(int id);
 
 	void delete(List<Integer> ids);
 
-	int update(Words word);
+	int update(Word word);
 }

@@ -12,7 +12,7 @@ import java.util.Random;
 import kr.co.leehana.sg.context.AppContext;
 import kr.co.leehana.sg.converter.TypeConverter;
 import kr.co.leehana.sg.model.Setting;
-import kr.co.leehana.sg.model.Words;
+import kr.co.leehana.sg.model.Word;
 import kr.co.leehana.sg.service.IWordService;
 import kr.co.leehana.sg.type.GenreType;
 import kr.co.leehana.sg.type.SentenceGenerateType;
@@ -29,7 +29,7 @@ public class SentenceGenerator {
 	private GenreType genreType;
 	private IWordService service;
 
-	private List<List<Words>> sentenceData = new ArrayList<>();
+	private List<List<Word>> sentenceData = new ArrayList<>();
 
 	private Setting setting;
 
@@ -48,10 +48,10 @@ public class SentenceGenerator {
 		tempWordTypeList.add(WordType.ADVERB);
 		tempWordTypeList.add(WordType.ADJECTIVE);
 
-		sentenceData.add(Collections.<Words>emptyList());
-		sentenceData.add(Collections.<Words>emptyList());
-		sentenceData.add(Collections.<Words>emptyList());
-		sentenceData.add(Collections.<Words>emptyList());
+		sentenceData.add(Collections.<Word>emptyList());
+		sentenceData.add(Collections.<Word>emptyList());
+		sentenceData.add(Collections.<Word>emptyList());
+		sentenceData.add(Collections.<Word>emptyList());
 
 		SentenceGenerateType sentenceGenerateType = setting.getFirstWordType();
 		int noneCount = 0;
@@ -132,9 +132,9 @@ public class SentenceGenerator {
 		}
 
 		if (randomCount > 0 || noneCount > 0) {
-			List<List<Words>> dummyList = new ArrayList<>(sentenceData);
+			List<List<Word>> dummyList = new ArrayList<>(sentenceData);
 			if (tempWordTypeList.size() == 1 && noneCount == 0) {
-				for (List<Words> words : sentenceData) {
+				for (List<Word> words : sentenceData) {
 					if (words.isEmpty()) {
 						int index = sentenceData.indexOf(words);
 						dummyList.remove(index);
@@ -152,7 +152,7 @@ public class SentenceGenerator {
 						randomIndex = makeRandomIndex(tempWordTypeList.size());
 					}
 					int count = 0;
-					for (List<Words> words : sentenceData) {
+					for (List<Word> words : sentenceData) {
 						if (words.isEmpty()) {
 							if (!insertIndexList.contains(count)) {
 								insertIndexList.add(count);
@@ -169,9 +169,9 @@ public class SentenceGenerator {
 
 			sentenceData = new ArrayList<>(dummyList);
 
-			for (List<Words> wordsList : dummyList) {
-				if (wordsList.isEmpty()) {
-					int index = dummyList.indexOf(wordsList);
+			for (List<Word> wordList : dummyList) {
+				if (wordList.isEmpty()) {
+					int index = dummyList.indexOf(wordList);
 					sentenceData.remove(index);
 				}
 			}
@@ -197,9 +197,9 @@ public class SentenceGenerator {
 
 		List<Spanned> grammarData = new ArrayList<>(20);
 		for (int i = 0; i < setting.getSentenceCount(); i++) {
-			List<Words> generatedGrammar = new ArrayList<>(4);
-			for (List<Words> wordsList : sentenceData) {
-				generatedGrammar.add(getRandomWord(wordsList, randomWordDataPicker));
+			List<Word> generatedGrammar = new ArrayList<>(4);
+			for (List<Word> wordList : sentenceData) {
+				generatedGrammar.add(getRandomWord(wordList, randomWordDataPicker));
 			}
 
 			if (sentenceData.size() == 1) {
@@ -207,10 +207,10 @@ public class SentenceGenerator {
 			}
 
 			List<String> newSentence = new ArrayList<>();
-			for (Words words : generatedGrammar) {
-				String wordValue = words.getWord();
-				String colorCode = AppContext.getColorCodeForWord(words.getType());
-				switch (words.getType()) {
+			for (Word word : generatedGrammar) {
+				String wordValue = word.getWord();
+				String colorCode = AppContext.getColorCodeForWord(word.getType());
+				switch (word.getType()) {
 					case NOUN:
 						wordValue = "<font color='" + colorCode + "'>" + wordValue + "</font>";
 						break;
@@ -235,7 +235,7 @@ public class SentenceGenerator {
 		return grammarData;
 	}
 
-	private Words getRandomWord(List<Words> word, Random random) {
+	private Word getRandomWord(List<Word> word, Random random) {
 		int wordPickIndex = 0;
 		for (int i = 0; i < 99; i++) {
 			wordPickIndex = random.nextInt(word.size());

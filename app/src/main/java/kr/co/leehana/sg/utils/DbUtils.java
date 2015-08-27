@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -21,18 +20,14 @@ import java.util.List;
 
 import kr.co.leehana.sg.AppProfile;
 import kr.co.leehana.sg.R;
-import kr.co.leehana.sg.db.SGDatabases;
 import kr.co.leehana.sg.db.SGSQLiteDbHelper;
 import kr.co.leehana.sg.factory.DbHelperFactory;
 import kr.co.leehana.sg.model.Favorite;
 import kr.co.leehana.sg.model.FavoriteCategory;
-import kr.co.leehana.sg.model.Setting;
-import kr.co.leehana.sg.model.Words;
+import kr.co.leehana.sg.model.Word;
 import kr.co.leehana.sg.service.FavoriteServiceImpl;
 import kr.co.leehana.sg.service.IFavoriteService;
-import kr.co.leehana.sg.service.ISettingService;
 import kr.co.leehana.sg.service.IWordService;
-import kr.co.leehana.sg.service.SettingServiceImpl;
 import kr.co.leehana.sg.service.WordServiceImpl;
 
 /**
@@ -230,7 +225,7 @@ public class DbUtils {
 		serverWordService.setHelper(serverDbHelper);
 		serverFavoriteService.setHelper(serverDbHelper);
 
-		List<Words> serverDbNoBackupWords = serverWordService.getNoBackupWords();
+		List<Word> serverDbNoBackupWords = serverWordService.getNoBackupWords();
 		List<Favorite> serverDbNoBackupFavorites = serverFavoriteService.getNoBackupFavorite();
 		List<FavoriteCategory> serverDbNoBackupFavoriteCategories = serverFavoriteService.getNoBackupFavoriteCategory();
 
@@ -254,9 +249,9 @@ public class DbUtils {
 		}
 	}
 
-	private static void wordDataMigration(IWordService localService, List<Words> serverDbNoBackupWords) {
+	private static void wordDataMigration(IWordService localService, List<Word> serverDbNoBackupWords) {
 		if (serverDbNoBackupWords != null && !serverDbNoBackupWords.isEmpty()) {
-			for (Words word : serverDbNoBackupWords) {
+			for (Word word : serverDbNoBackupWords) {
 				word.setBackup(true);
 
 				localService.insert(word);

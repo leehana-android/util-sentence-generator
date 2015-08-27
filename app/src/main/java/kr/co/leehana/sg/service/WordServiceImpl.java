@@ -11,7 +11,7 @@ import kr.co.leehana.sg.converter.BoolConverter;
 import kr.co.leehana.sg.converter.TypeConverter;
 import kr.co.leehana.sg.db.SGDatabases;
 import kr.co.leehana.sg.db.SGSQLiteDbHelper;
-import kr.co.leehana.sg.model.Words;
+import kr.co.leehana.sg.model.Word;
 import kr.co.leehana.sg.type.GenreType;
 import kr.co.leehana.sg.type.WordType;
 
@@ -42,8 +42,8 @@ public class WordServiceImpl implements IWordService {
 	}
 
 	@Override
-	public List<Words> getWords(WordType type, GenreType genreType) {
-		List<Words> wordsList = new ArrayList<>();
+	public List<Word> getWords(WordType type, GenreType genreType) {
+		List<Word> wordList = new ArrayList<>();
 		String whereClause = makeSelectWhereClause();
 
 		String typeString = String.valueOf(type.getIndexCode());
@@ -56,22 +56,22 @@ public class WordServiceImpl implements IWordService {
 		Cursor c = helper.getRDb().query(SGDatabases._T_WORD, null, whereClause, whereArgs, null, null, orderBy);
 
 		while (c.moveToNext()) {
-			Words words = new Words();
-			words.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
-			words.setWord(c.getString(c.getColumnIndex(SGDatabases._C_WORD)));
-			words.setType(TypeConverter.intToWordType(c.getInt(c.getColumnIndex(SGDatabases._C_TYPE))));
-			words.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
-			words.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
-			words.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			Word word = new Word();
+			word.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			word.setWord(c.getString(c.getColumnIndex(SGDatabases._C_WORD)));
+			word.setType(TypeConverter.intToWordType(c.getInt(c.getColumnIndex(SGDatabases._C_TYPE))));
+			word.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
+			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
 
-			wordsList.add(words);
+			wordList.add(word);
 		}
-		return wordsList;
+		return wordList;
 	}
 
 	@Override
-	public List<Words> getNoBackupWords() {
-		List<Words> wordsList = new ArrayList<>();
+	public List<Word> getNoBackupWords() {
+		List<Word> wordList = new ArrayList<>();
 		String whereClause = SGDatabases._C_BACKUP + "=?";
 
 		String[] whereArgs = new String[] { "0" };
@@ -82,17 +82,17 @@ public class WordServiceImpl implements IWordService {
 		Cursor c = helper.getRDb().query(SGDatabases._T_WORD, null, whereClause, whereArgs, null, null, orderBy);
 
 		while (c.moveToNext()) {
-			Words words = new Words();
-			words.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
-			words.setWord(c.getString(c.getColumnIndex(SGDatabases._C_WORD)));
-			words.setType(TypeConverter.intToWordType(c.getInt(c.getColumnIndex(SGDatabases._C_TYPE))));
-			words.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
-			words.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
-			words.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			Word word = new Word();
+			word.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			word.setWord(c.getString(c.getColumnIndex(SGDatabases._C_WORD)));
+			word.setType(TypeConverter.intToWordType(c.getInt(c.getColumnIndex(SGDatabases._C_TYPE))));
+			word.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
+			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
 
-			wordsList.add(words);
+			wordList.add(word);
 		}
-		return wordsList;
+		return wordList;
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class WordServiceImpl implements IWordService {
 	}
 
 	@Override
-	public void insert(Words word) {
+	public void insert(Word word) {
 		ContentValues newValues = new ContentValues();
 		newValues.put(SGDatabases._C_WORD, word.getWord());
 		newValues.put(SGDatabases._C_TYPE, word.getType().getIndexCode());
@@ -127,16 +127,16 @@ public class WordServiceImpl implements IWordService {
 	}
 
 	@Override
-	public void insert(List<Words> wordsList) {
-		if (wordsList != null) {
-			for (Words words : wordsList) {
-				insert(words);
+	public void insert(List<Word> wordList) {
+		if (wordList != null) {
+			for (Word word : wordList) {
+				insert(word);
 			}
 		}
 	}
 
 	@Override
-	public void delete(Words word) {
+	public void delete(Word word) {
 		delete(word.getId());
 	}
 
@@ -155,7 +155,7 @@ public class WordServiceImpl implements IWordService {
 	}
 
 	@Override
-	public int update(Words word) {
+	public int update(Word word) {
 		String wordIdStringValue = String.valueOf(word.getId());
 		ContentValues updateValue = new ContentValues();
 		updateValue.put(SGDatabases._C_WORD, word.getWord());

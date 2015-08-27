@@ -9,7 +9,7 @@ import kr.co.leehana.sg.type.WordType;
  * @author Hana Lee
  * @since 2015-08-13 03:27
  */
-public class Words {
+public class Word {
 
 	private int id;
 	private String word;
@@ -18,10 +18,10 @@ public class Words {
 	private String createDate;
 	private boolean backup = true;
 
-	public Words() {
+	public Word() {
 	}
 
-	public Words(boolean backup, String createDate, GenreType genreType, int id, WordType type, String word) {
+	public Word(boolean backup, String createDate, GenreType genreType, int id, WordType type, String word) {
 		this.backup = backup;
 		this.createDate = createDate;
 		this.genreType = genreType;
@@ -83,14 +83,14 @@ public class Words {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		Words words = (Words) o;
+		Word word = (Word) o;
 
-		if (id != words.id) return false;
-		if (backup != words.backup) return false;
-		if (!word.equals(words.word)) return false;
-		if (type != words.type) return false;
-		if (genreType != words.genreType) return false;
-		return createDate.equals(words.createDate);
+		if (id != word.id) return false;
+		if (backup != word.backup) return false;
+		if (!this.word.equals(word.word)) return false;
+		if (type != word.type) return false;
+		if (genreType != word.genreType) return false;
+		return createDate.equals(word.createDate);
 
 	}
 
