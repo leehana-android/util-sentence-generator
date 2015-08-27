@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	private Button favoriteBtn;
 	private Button generateBtn;
 
-	private AlertDialog generateWordSelectDialog;
 	private AlertDialog newWordGenreSelectDialog;
 
 	private Intent intent;
@@ -83,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		generateBtn = (Button) findViewById(R.id.btn_generate);
 		generateBtn.setOnClickListener(this);
 
-		makeGenerateWordSelectDialog();
 		makeNewWordGenreSelectDialog();
 	}
 
@@ -155,49 +153,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		});
 
 		newWordGenreSelectDialog = builder.create();
-	}
-
-
-	private void makeGenerateWordSelectDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.generate_target_select_menu_title);
-		builder.setCancelable(false);
-		builder.setIcon(R.drawable.love_heart_48);
-
-		builder.setMultiChoiceItems(R.array.word_list, WordStructure.wordChecked, new DialogInterface.OnMultiChoiceClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-				WordStructure.wordChecked[which] = isChecked;
-			}
-		});
-
-		builder.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				int trueCount = 0;
-				for (boolean checked : WordStructure.wordChecked) {
-					if (checked) {
-						trueCount++;
-					}
-				}
-
-				if (trueCount == 0) {
-					showNoSelectedAlertDialog();
-				} else {
-					Intent intent = new Intent(getBaseContext(), SentenceActivity.class);
-					startActivity(intent);
-				}
-			}
-		});
-
-		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-
-		generateWordSelectDialog = builder.create();
 	}
 
 	private ListAdapter makeGenreListAdapter() {
