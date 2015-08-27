@@ -56,7 +56,7 @@ public class DbUtils {
 		if (!bResult) {   // DB가 없으면 복사
 			copyDatabaseToSystemFolder(context);
 		}
-//		copyDatabaseToSystemFolder(context);
+		copyDatabaseToSystemFolder(context);
 	}
 
 	private static boolean isDatabaseExistOnSystemFolder() {
@@ -77,12 +77,19 @@ public class DbUtils {
 			bis = new BufferedInputStream(is);
 
 			if (!folder.exists()) {
-				folder.mkdirs();
+				boolean result = folder.mkdirs();
+				if (!result) {
+					return;
+				}
 			}
 
 			if (file.exists()) {
-				file.delete();
-				file.createNewFile();
+				if (file.delete()) {
+					boolean result = file.createNewFile();
+					if (!result) {
+						return;
+					}
+				}
 			}
 
 			fos = new FileOutputStream(file);
@@ -225,31 +232,29 @@ public class DbUtils {
 		serverWordService.setHelper(serverDbHelper);
 		serverFavoriteService.setHelper(serverDbHelper);
 
-		List<Word> serverDbNoBackupWords = serverWordService.getNoBackupWords();
-		List<Favorite> serverDbNoBackupFavorites = serverFavoriteService.getNoBackupFavorite();
-		List<FavoriteCategory> serverDbNoBackupFavoriteCategories = serverFavoriteService.getNoBackupFavoriteCategory();
+		List<Word> serverDbNoBackupWords = serverWordService.getWordsByBackupStatus(false);
+		List<Favorite> serverDbNoBackupFavorites = serverFavoriteService.getFavoritesByBackupStatus(false);
+		List<FavoriteCategory> serverDbNoBackupFavoriteCategories = serverFavoriteService.getFavoriteCategoriesByBackupStatus(false);
+
+		List<Word> serverDbModifiedWords = serverWordService.getWordsByModifyStatus(true);
+		List<Favorite> serverDbModifiedFavorites = serverFavoriteService.getFavoritesByModifyStatus(true);
+		List<FavoriteCategory> serverDbModifiedFavoriteCategories = serverFavoriteService.getFavoriteCategoriesByModifyStatus(true);
 
 		WordServiceImpl localWordService = WordServiceImpl.getInstance();
 		FavoriteServiceImpl localFavoriteService = FavoriteServiceImpl.getInstance();
 		localWordService.setHelper(localDbHelper);
 		localFavoriteService.setHelper(localDbHelper);
 
-		wordDataMigration(localWordService, serverDbNoBackupWords);
-		favoriteDataMigration(localFavoriteService, serverDbNoBackupFavorites);
-		favoriteCategoryDataMigration(localFavoriteService, serverDbNoBackupFavoriteCategories);
+		noBackupWordDataMigration(localWordService, serverDbNoBackupWords);
+		noBackupFavoriteDataMigration(localFavoriteService, serverDbNoBackupFavorites);
+		noBackupFavoriteCategoryDataMigration(localFavoriteService, serverDbNoBackupFavoriteCategories);
+
+		modifiedWordDataMigration(localWordService, serverDbModifiedWords);
+		modifiedFavoriteDataMigration(localFavoriteService, serverDbModifiedFavorites);
+		modifiedFavoriteCategoryDataMigration(localFavoriteService, serverDbModifiedFavoriteCategories);
 	}
 
-	private static void favoriteCategoryDataMigration(IFavoriteService localService, List<FavoriteCategory> serverDbNoBackupFavoriteCategories) {
-		if (serverDbNoBackupFavoriteCategories != null && !serverDbNoBackupFavoriteCategories.isEmpty()) {
-			for (FavoriteCategory favoriteCategory : serverDbNoBackupFavoriteCategories) {
-				favoriteCategory.setBackup(true);
-
-				localService.insertCategory(favoriteCategory);
-			}
-		}
-	}
-
-	private static void wordDataMigration(IWordService localService, List<Word> serverDbNoBackupWords) {
+	private static void noBackupWordDataMigration(IWordService localService, List<Word> serverDbNoBackupWords) {
 		if (serverDbNoBackupWords != null && !serverDbNoBackupWords.isEmpty()) {
 			for (Word word : serverDbNoBackupWords) {
 				word.setBackup(true);
@@ -259,12 +264,52 @@ public class DbUtils {
 		}
 	}
 
-	private static void favoriteDataMigration(IFavoriteService localService, List<Favorite> serverDbNoBackupFavorites) {
+	private static void noBackupFavoriteDataMigration(IFavoriteService localService, List<Favorite> serverDbNoBackupFavorites) {
 		if (serverDbNoBackupFavorites != null && !serverDbNoBackupFavorites.isEmpty()) {
 			for (Favorite favorite : serverDbNoBackupFavorites) {
 				favorite.setBackup(true);
 
 				localService.insert(favorite);
+			}
+		}
+	}
+
+	private static void noBackupFavoriteCategoryDataMigration(IFavoriteService localService, List<FavoriteCategory> serverDbNoBackupFavoriteCategories) {
+		if (serverDbNoBackupFavoriteCategories != null && !serverDbNoBackupFavoriteCategories.isEmpty()) {
+			for (FavoriteCategory favoriteCategory : serverDbNoBackupFavoriteCategories) {
+				favoriteCategory.setBackup(true);
+
+				localService.insertCategory(favoriteCategory);
+			}
+		}
+	}
+
+	private static void modifiedWordDataMigration(IWordService localService, List<Word> serverDbModifiedWords) {
+		if (serverDbModifiedWords != null && !serverDbModifiedWords.isEmpty()) {
+			for (Word modifiedWord : serverDbModifiedWords) {
+				modifiedWord.setModified(false);
+
+				localService.update(modifiedWord);
+			}
+		}
+	}
+
+	private static void modifiedFavoriteDataMigration(IFavoriteService localService, List<Favorite> serverDbModifiedFavorites) {
+		if (serverDbModifiedFavorites != null && !serverDbModifiedFavorites.isEmpty()) {
+			for (Favorite modifiedFavorite : serverDbModifiedFavorites) {
+				modifiedFavorite.setModified(false);
+
+				localService.update(modifiedFavorite);
+			}
+		}
+	}
+
+	private static void modifiedFavoriteCategoryDataMigration(IFavoriteService localService, List<FavoriteCategory> serverDbModifiedFavoriteCategories) {
+		if (serverDbModifiedFavoriteCategories != null && !serverDbModifiedFavoriteCategories.isEmpty()) {
+			for (FavoriteCategory modifiedFavoriteCategory : serverDbModifiedFavoriteCategories) {
+				modifiedFavoriteCategory.setModified(false);
+
+				localService.updateCategory(modifiedFavoriteCategory);
 			}
 		}
 	}

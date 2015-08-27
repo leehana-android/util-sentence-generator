@@ -172,13 +172,45 @@ public class FavoriteServiceImpl implements IFavoriteService {
 	}
 
 	@Override
-	public List<Favorite> getNoBackupFavorite() {
+	public List<Favorite> getFavoritesByBackupStatus(boolean isBackup) {
 		List<Favorite> favoriteList = new ArrayList<>();
 
 		String tableName = SGDatabases._T_FAVORITE;
 		String[] selectColumns = new String[]{"*"};
 		String whereClause = SGDatabases._C_BACKUP + "=?";
-		String[] whereArgs = {"0"};
+		String[] whereArgs = {String.valueOf(BoolConverter.boolToInt(isBackup))};
+		String groupBy = "";
+		String having = "";
+		String orderBy = SGDatabases._C_C_DATE + " DESC";
+
+		@SuppressLint("Recycle")
+		Cursor c = helper.getRDb().query(tableName, selectColumns, whereClause, whereArgs, groupBy, having, orderBy);
+
+		while (c.moveToNext()) {
+			Favorite favorite = new Favorite();
+			favorite.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			favorite.setParentId(c.getInt(c.getColumnIndex(SGDatabases._C_PARENT)));
+			favorite.setSentence(c.getString(c.getColumnIndex(SGDatabases._C_SENTENCE)));
+			favorite.setRate(c.getInt(c.getColumnIndex(SGDatabases._C_RATE)));
+			favorite.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			favorite.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			favorite.setEnabled(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_ENABLED))));
+			favorite.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
+			favorite.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
+
+			favoriteList.add(favorite);
+		}
+		return favoriteList;
+	}
+
+	@Override
+	public List<Favorite> getFavoritesByModifyStatus(boolean isModified) {
+		List<Favorite> favoriteList = new ArrayList<>();
+
+		String tableName = SGDatabases._T_FAVORITE;
+		String[] selectColumns = new String[]{"*"};
+		String whereClause = SGDatabases._C_MODIFIED + "=?";
+		String[] whereArgs = {String.valueOf(BoolConverter.boolToInt(isModified))};
 		String groupBy = "";
 		String having = "";
 		String orderBy = SGDatabases._C_C_DATE + " DESC";
@@ -367,13 +399,44 @@ public class FavoriteServiceImpl implements IFavoriteService {
 	}
 
 	@Override
-	public List<FavoriteCategory> getNoBackupFavoriteCategory() {
+	public List<FavoriteCategory> getFavoriteCategoriesByBackupStatus(boolean isBackup) {
 		List<FavoriteCategory> favoriteCategories = new ArrayList<>();
 
 		String tableName = SGDatabases._T_FAVORITE_CATEGORY;
 		String[] selectColumns = new String[]{"*"};
 		String whereClause = SGDatabases._C_BACKUP + "=?";
-		String[] whereArgs = {"0"};
+		String[] whereArgs = {String.valueOf(BoolConverter.boolToInt(isBackup))};
+		String groupBy = "";
+		String having = "";
+		String orderBy = SGDatabases._C_C_DATE + " DESC";
+
+		@SuppressLint("Recycle")
+		Cursor c = helper.getRDb().query(tableName, selectColumns, whereClause, whereArgs, groupBy, having, orderBy);
+
+		while (c.moveToNext()) {
+			FavoriteCategory favoriteCategory = new FavoriteCategory();
+			favoriteCategory.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			favoriteCategory.setName(c.getString(c.getColumnIndex(SGDatabases._C_NAME)));
+			favoriteCategory.setRate(c.getInt(c.getColumnIndex(SGDatabases._C_RATE)));
+			favoriteCategory.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			favoriteCategory.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			favoriteCategory.setEnabled(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_ENABLED))));
+			favoriteCategory.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
+			favoriteCategory.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
+
+			favoriteCategories.add(favoriteCategory);
+		}
+		return favoriteCategories;
+	}
+
+	@Override
+	public List<FavoriteCategory> getFavoriteCategoriesByModifyStatus(boolean isModified) {
+		List<FavoriteCategory> favoriteCategories = new ArrayList<>();
+
+		String tableName = SGDatabases._T_FAVORITE_CATEGORY;
+		String[] selectColumns = new String[]{"*"};
+		String whereClause = SGDatabases._C_MODIFIED + "=?";
+		String[] whereArgs = {String.valueOf(BoolConverter.boolToInt(isModified))};
 		String groupBy = "";
 		String having = "";
 		String orderBy = SGDatabases._C_C_DATE + " DESC";
@@ -451,7 +514,7 @@ public class FavoriteServiceImpl implements IFavoriteService {
 	@Override
 	public void deleteCategory(int id) {
 		String favoriteId = String.valueOf(id);
-		
+
 		String tableName = SGDatabases._T_FAVORITE_CATEGORY;
 		String whereClause = SGDatabases.CreateDB._ID + "=?";
 		String[] whereArgs = {favoriteId};

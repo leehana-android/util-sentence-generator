@@ -16,7 +16,11 @@ public interface IWordService {
 
 	List<Word> getWords(WordType type, GenreType genreType);
 
-	List<Word> getNoBackupWords();
+	List<Word> getWords();
+
+	List<Word> getWordsByBackupStatus(boolean isBackup);
+
+	List<Word> getWordsByModifyStatus(boolean isModified);
 
 	int getCount(WordType type, GenreType genreType);
 

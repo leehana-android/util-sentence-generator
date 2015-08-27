@@ -72,11 +72,71 @@ public class WordServiceImpl implements IWordService {
 	}
 
 	@Override
-	public List<Word> getNoBackupWords() {
+	public List<Word> getWords() {
+		String tableName = SGDatabases._T_WORD;
+		String[] selectColumns = new String[]{"*"};
+		String whereClause = "";
+
+		String[] whereArgs = new String[]{};
+
+		String having = "";
+		String groupBy = "";
+		String orderBy = SGDatabases._C_WORD + "," + SGDatabases._C_C_DATE + " DESC";
+
+		@SuppressLint("Recycle")
+		Cursor c = helper.getRDb().query(tableName, selectColumns, whereClause, whereArgs, groupBy, having, orderBy);
+
+		List<Word> wordList = new ArrayList<>();
+		while (c.moveToNext()) {
+			Word word = new Word();
+			word.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			word.setWord(c.getString(c.getColumnIndex(SGDatabases._C_WORD)));
+			word.setType(TypeConverter.intToWordType(c.getInt(c.getColumnIndex(SGDatabases._C_TYPE))));
+			word.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
+			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			word.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
+			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+
+			wordList.add(word);
+		}
+		return wordList;
+	}
+
+	@Override
+	public List<Word> getWordsByBackupStatus(boolean isBackup) {
 		String tableName = SGDatabases._T_WORD;
 		String[] selectColumns = new String[]{"*"};
 		String whereClause = SGDatabases._C_BACKUP + "=?";
-		String[] whereArgs = new String[]{"0"};
+		String[] whereArgs = new String[]{String.valueOf(BoolConverter.boolToInt(isBackup))};
+		String groupBy = "";
+		String having = "";
+		String orderBy = SGDatabases._C_WORD + "," + SGDatabases._C_C_DATE + " DESC";
+
+		@SuppressLint("Recycle")
+		Cursor c = helper.getRDb().query(tableName, selectColumns, whereClause, whereArgs, groupBy, having, orderBy);
+
+		List<Word> wordList = new ArrayList<>();
+		while (c.moveToNext()) {
+			Word word = new Word();
+			word.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
+			word.setWord(c.getString(c.getColumnIndex(SGDatabases._C_WORD)));
+			word.setType(TypeConverter.intToWordType(c.getInt(c.getColumnIndex(SGDatabases._C_TYPE))));
+			word.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
+			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			word.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
+			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+
+			wordList.add(word);
+		}
+		return wordList;
+	}
+
+	@Override
+	public List<Word> getWordsByModifyStatus(boolean isModified) {
+		String tableName = SGDatabases._T_WORD;
+		String[] selectColumns = new String[]{"*"};
+		String whereClause = SGDatabases._C_MODIFIED + "=?";
+		String[] whereArgs = new String[]{String.valueOf(BoolConverter.boolToInt(isModified))};
 		String groupBy = "";
 		String having = "";
 		String orderBy = SGDatabases._C_WORD + "," + SGDatabases._C_C_DATE + " DESC";

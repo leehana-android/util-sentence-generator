@@ -12,7 +12,7 @@ public interface ISettingService {
 
 	Setting getSetting();
 
-	Setting getNoBackupSetting();
+	Setting getSettingByModifyStatus(boolean isModified);
 
 	void update(Setting setting);
 }

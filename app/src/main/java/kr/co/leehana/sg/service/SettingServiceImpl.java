@@ -66,11 +66,11 @@ public class SettingServiceImpl implements ISettingService {
 	}
 
 	@Override
-	public Setting getNoBackupSetting() {
+	public Setting getSettingByModifyStatus(boolean isModified) {
 		String tableName = SGDatabases._T_SETTING;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_BACKUP + "=?";
-		String[] whereArgs = {"0"};
+		String whereClause = SGDatabases._C_MODIFIED + "=?";
+		String[] whereArgs = {String.valueOf(BoolConverter.boolToInt(isModified))};
 		String groupBy = "";
 		String having = "";
 		String orderBy = "";
@@ -111,7 +111,7 @@ public class SettingServiceImpl implements ISettingService {
 		String tableName = SGDatabases._T_SETTING;
 		String whereClause = SGDatabases.CreateDB._ID + "=?";
 		String[] whereArgs = {String.valueOf(setting.getId())};
-		
+
 		helper.getWDb().update(tableName, newValues, whereClause, whereArgs);
 	}
 }
