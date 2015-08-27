@@ -17,7 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ListAdapter;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ import kr.co.leehana.sg.context.AppContext;
 import kr.co.leehana.sg.converter.TypeConverter;
 import kr.co.leehana.sg.factory.DbHelperFactory;
 import kr.co.leehana.sg.model.Genre;
-import kr.co.leehana.sg.model.WordStructure;
 import kr.co.leehana.sg.service.ISettingService;
 import kr.co.leehana.sg.service.SettingServiceImpl;
 import kr.co.leehana.sg.utils.DbUtils;
