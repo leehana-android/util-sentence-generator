@@ -18,20 +18,8 @@ public class FavoriteCategory {
 	private int rate = 1;
 	private String createDate;
 	private boolean backup = true;
+	private boolean modified = false;
 	private boolean enabled;
-
-	public FavoriteCategory() {
-	}
-
-	public FavoriteCategory(boolean backup, String createDate, boolean enabled, GenreType genreType, int id, String name, int rate) {
-		this.backup = backup;
-		this.createDate = createDate;
-		this.enabled = enabled;
-		this.genreType = genreType;
-		this.id = id;
-		this.name = name;
-		this.rate = rate;
-	}
 
 	public boolean isBackup() {
 		return backup;
@@ -89,6 +77,14 @@ public class FavoriteCategory {
 		this.rate = rate;
 	}
 
+	public boolean isModified() {
+		return modified;
+	}
+
+	public void setModified(boolean modified) {
+		this.modified = modified;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -99,6 +95,7 @@ public class FavoriteCategory {
 		if (id != that.id) return false;
 		if (rate != that.rate) return false;
 		if (backup != that.backup) return false;
+		if (modified != that.modified) return false;
 		if (enabled != that.enabled) return false;
 		if (!name.equals(that.name)) return false;
 		if (genreType != that.genreType) return false;
@@ -114,6 +111,7 @@ public class FavoriteCategory {
 		result = 31 * result + rate;
 		result = 31 * result + createDate.hashCode();
 		result = 31 * result + (backup ? 1 : 0);
+		result = 31 * result + (modified ? 1 : 0);
 		result = 31 * result + (enabled ? 1 : 0);
 		return result;
 	}

@@ -31,10 +31,7 @@ public class WordServiceImpl implements IWordService {
 		return service;
 	}
 
-	private WordServiceImpl(){}
-
-	public SGSQLiteDbHelper getHelper() {
-		return helper;
+	private WordServiceImpl() {
 	}
 
 	public void setHelper(SGSQLiteDbHelper helper) {
@@ -43,18 +40,22 @@ public class WordServiceImpl implements IWordService {
 
 	@Override
 	public List<Word> getWords(WordType type, GenreType genreType) {
-		List<Word> wordList = new ArrayList<>();
-		String whereClause = makeSelectWhereClause();
+		String tableName = SGDatabases._T_WORD;
+		String[] selectColumns = new String[]{"*"};
+		String whereClause = SGDatabases._C_TYPE + "=?" + " AND " + SGDatabases._C_GENRE + "=?";
 
 		String typeString = String.valueOf(type.getIndexCode());
 		String genreTypeString = String.valueOf(genreType.getIndexCode());
-		String[] whereArgs = new String[] { typeString, genreTypeString };
+		String[] whereArgs = new String[]{typeString, genreTypeString};
 
+		String having = "";
+		String groupBy = "";
 		String orderBy = SGDatabases._C_WORD + "," + SGDatabases._C_C_DATE + " DESC";
 
 		@SuppressLint("Recycle")
-		Cursor c = helper.getRDb().query(SGDatabases._T_WORD, null, whereClause, whereArgs, null, null, orderBy);
+		Cursor c = helper.getRDb().query(tableName, selectColumns, whereClause, whereArgs, groupBy, having, orderBy);
 
+		List<Word> wordList = new ArrayList<>();
 		while (c.moveToNext()) {
 			Word word = new Word();
 			word.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
@@ -62,6 +63,7 @@ public class WordServiceImpl implements IWordService {
 			word.setType(TypeConverter.intToWordType(c.getInt(c.getColumnIndex(SGDatabases._C_TYPE))));
 			word.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
 			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			word.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
 			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
 
 			wordList.add(word);
@@ -71,16 +73,18 @@ public class WordServiceImpl implements IWordService {
 
 	@Override
 	public List<Word> getNoBackupWords() {
-		List<Word> wordList = new ArrayList<>();
+		String tableName = SGDatabases._T_WORD;
+		String[] selectColumns = new String[]{"*"};
 		String whereClause = SGDatabases._C_BACKUP + "=?";
-
-		String[] whereArgs = new String[] { "0" };
-
+		String[] whereArgs = new String[]{"0"};
+		String groupBy = "";
+		String having = "";
 		String orderBy = SGDatabases._C_WORD + "," + SGDatabases._C_C_DATE + " DESC";
 
 		@SuppressLint("Recycle")
-		Cursor c = helper.getRDb().query(SGDatabases._T_WORD, null, whereClause, whereArgs, null, null, orderBy);
+		Cursor c = helper.getRDb().query(tableName, selectColumns, whereClause, whereArgs, groupBy, having, orderBy);
 
+		List<Word> wordList = new ArrayList<>();
 		while (c.moveToNext()) {
 			Word word = new Word();
 			word.setId(c.getInt(c.getColumnIndex(SGDatabases.CreateDB._ID)));
@@ -88,6 +92,7 @@ public class WordServiceImpl implements IWordService {
 			word.setType(TypeConverter.intToWordType(c.getInt(c.getColumnIndex(SGDatabases._C_TYPE))));
 			word.setGenreType(TypeConverter.intToGenreType(c.getInt(c.getColumnIndex(SGDatabases._C_GENRE))));
 			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
+			word.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
 			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
 
 			wordList.add(word);
@@ -97,19 +102,21 @@ public class WordServiceImpl implements IWordService {
 
 	@Override
 	public int getCount(WordType type, GenreType genreType) {
-		String whereClause = makeSelectWhereClause();
+		String tableName = SGDatabases._T_WORD;
+		String[] selectColumns = new String[]{"*"};
+		String whereClause = SGDatabases._C_TYPE + "=?" + " AND " + SGDatabases._C_GENRE + "=?";
 
 		String typeString = String.valueOf(type.getIndexCode());
 		String genreTypeString = String.valueOf(genreType.getIndexCode());
-		String[] whereArgs = new String[] { typeString, genreTypeString };
+		String[] whereArgs = new String[]{typeString, genreTypeString};
+
+		String groupBy = "";
+		String having = "";
+		String orderBy = "";
 
 		@SuppressLint("Recycle")
-		Cursor c = helper.getRDb().query(SGDatabases._T_WORD, null, whereClause, whereArgs, null, null, null);
+		Cursor c = helper.getRDb().query(tableName, selectColumns, whereClause, whereArgs, groupBy, having, orderBy);
 		return c.getCount();
-	}
-
-	private String makeSelectWhereClause() {
-		return SGDatabases._C_TYPE + "=?" + " AND " + SGDatabases._C_GENRE + "=?";
 	}
 
 	@Override
@@ -119,9 +126,13 @@ public class WordServiceImpl implements IWordService {
 		newValues.put(SGDatabases._C_TYPE, word.getType().getIndexCode());
 		newValues.put(SGDatabases._C_C_DATE, word.getCreateDate());
 		newValues.put(SGDatabases._C_BACKUP, word.isBackup());
+		newValues.put(SGDatabases._C_MODIFIED, word.isModified());
 		newValues.put(SGDatabases._C_GENRE, word.getGenreType().getIndexCode());
 
-		long newId = helper.getWDb().insert(SGDatabases._T_WORD, null, newValues);
+		String tableName = SGDatabases._T_WORD;
+		String nullColumnHack = "";
+
+		long newId = helper.getWDb().insert(tableName, nullColumnHack, newValues);
 
 		word.setId((int) newId);
 	}
@@ -142,7 +153,11 @@ public class WordServiceImpl implements IWordService {
 
 	@Override
 	public void delete(int id) {
-		helper.getWDb().delete(SGDatabases._T_WORD, SGDatabases.CreateDB._ID + "=?", new String[]{String.valueOf(id)});
+		String tableName = SGDatabases._T_WORD;
+		String whereClause = SGDatabases.CreateDB._ID + "=?";
+		String[] whereArgs = {String.valueOf(id)};
+
+		helper.getWDb().delete(tableName, whereClause, whereArgs);
 	}
 
 	@Override
@@ -162,8 +177,13 @@ public class WordServiceImpl implements IWordService {
 		updateValue.put(SGDatabases._C_TYPE, word.getType().getIndexCode());
 		updateValue.put(SGDatabases._C_C_DATE, word.getCreateDate());
 		updateValue.put(SGDatabases._C_BACKUP, word.isBackup());
+		updateValue.put(SGDatabases._C_MODIFIED, word.isModified());
 		updateValue.put(SGDatabases._C_GENRE, word.getGenreType().getIndexCode());
 
-		return helper.getWDb().update(SGDatabases._T_WORD, updateValue, SGDatabases.CreateDB._ID + "=?", new String[]{wordIdStringValue});
+		String tableName = SGDatabases._T_WORD;
+		String whereClause = SGDatabases.CreateDB._ID + "=?";
+		String[] whereArgs = {wordIdStringValue};
+
+		return helper.getWDb().update(tableName, updateValue, whereClause, whereArgs);
 	}
 }

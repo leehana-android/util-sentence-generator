@@ -29,10 +29,6 @@ public class SettingServiceImpl implements ISettingService {
 	private SettingServiceImpl() {
 	}
 
-	public SGSQLiteDbHelper getHelper() {
-		return helper;
-	}
-
 	public void setHelper(SGSQLiteDbHelper helper) {
 		this.helper = helper;
 	}
@@ -40,8 +36,16 @@ public class SettingServiceImpl implements ISettingService {
 	@Override
 	public Setting getSetting() {
 
+		String tableName = SGDatabases._T_SETTING;
+		String[] selectColumns = new String[]{"*"};
+		String whereClause = "";
+		String[] whereArgs = new String[]{};
+		String groupBy = "";
+		String having = "";
+		String orderBy = "";
+
 		@SuppressLint("Recycle")
-		Cursor c = helper.getRDb().query(SGDatabases._T_SETTING, null, null, null, null, null, null);
+		Cursor c = helper.getRDb().query(tableName, selectColumns, whereClause, whereArgs, groupBy, having, orderBy);
 
 		Setting setting = null;
 
@@ -53,6 +57,7 @@ public class SettingServiceImpl implements ISettingService {
 			setting.setSecondWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_SECOND_TYPE))));
 			setting.setThirdWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_THIRD_TYPE))));
 			setting.setFourthWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_FOURTH_TYPE))));
+			setting.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
 			setting.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
 			setting.setCreated(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
 		}
@@ -62,8 +67,16 @@ public class SettingServiceImpl implements ISettingService {
 
 	@Override
 	public Setting getNoBackupSetting() {
+		String tableName = SGDatabases._T_SETTING;
+		String[] selectColumns = new String[]{"*"};
+		String whereClause = SGDatabases._C_BACKUP + "=?";
+		String[] whereArgs = {"0"};
+		String groupBy = "";
+		String having = "";
+		String orderBy = "";
+
 		@SuppressLint("Recycle")
-		Cursor c = helper.getRDb().query(SGDatabases._T_SETTING, null, SGDatabases._C_BACKUP + "=?", new String[]{"0"}, null, null, null);
+		Cursor c = helper.getRDb().query(tableName, selectColumns, whereClause, whereArgs, groupBy, having, orderBy);
 
 		Setting setting = null;
 
@@ -75,6 +88,7 @@ public class SettingServiceImpl implements ISettingService {
 			setting.setSecondWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_SECOND_TYPE))));
 			setting.setThirdWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_THIRD_TYPE))));
 			setting.setFourthWordType(TypeConverter.intToSentenceGenerateType(c.getInt(c.getColumnIndex(SGDatabases._C_FOURTH_TYPE))));
+			setting.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
 			setting.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
 			setting.setCreated(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
 		}
@@ -90,9 +104,14 @@ public class SettingServiceImpl implements ISettingService {
 		newValues.put(SGDatabases._C_SECOND_TYPE, setting.getSecondWordType().getIndexCode());
 		newValues.put(SGDatabases._C_THIRD_TYPE, setting.getThirdWordType().getIndexCode());
 		newValues.put(SGDatabases._C_FOURTH_TYPE, setting.getFourthWordType().getIndexCode());
+		newValues.put(SGDatabases._C_MODIFIED, setting.isModified());
 		newValues.put(SGDatabases._C_C_DATE, setting.getCreated());
 		newValues.put(SGDatabases._C_BACKUP, setting.isBackup());
 
-		helper.getWDb().update(SGDatabases._T_SETTING, newValues, SGDatabases.CreateDB._ID + "=?", new String[]{String.valueOf(setting.getId())});
+		String tableName = SGDatabases._T_SETTING;
+		String whereClause = SGDatabases.CreateDB._ID + "=?";
+		String[] whereArgs = {String.valueOf(setting.getId())};
+		
+		helper.getWDb().update(tableName, newValues, whereClause, whereArgs);
 	}
 }

@@ -16,7 +16,7 @@ public interface IFavoriteService {
 
 	List<Favorite> getFavorites();
 
-	List<Favorite> getFavorites(GenreType genreType);
+	List<Favorite> getFavoritesByGenre(GenreType genreType);
 
 	List<Favorite> getFavoritesByParent(FavoriteCategory parent);
 

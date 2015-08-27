@@ -17,21 +17,8 @@ public class Setting {
 	private SentenceGenerateType thirdWordType;
 	private SentenceGenerateType fourthWordType;
 	private String created;
+	private boolean modified = false;
 	private boolean backup = true;
-
-	public Setting() {
-	}
-
-	public Setting(boolean backup, String created, SentenceGenerateType firstWordType, SentenceGenerateType fourthWordType, int id, SentenceGenerateType secondWordType, int sentenceCount, SentenceGenerateType thirdWordType) {
-		this.backup = backup;
-		this.created = created;
-		this.firstWordType = firstWordType;
-		this.fourthWordType = fourthWordType;
-		this.id = id;
-		this.secondWordType = secondWordType;
-		this.sentenceCount = sentenceCount;
-		this.thirdWordType = thirdWordType;
-	}
 
 	public boolean isBackup() {
 		return backup;
@@ -97,6 +84,14 @@ public class Setting {
 		this.thirdWordType = thirdWordType;
 	}
 
+	public boolean isModified() {
+		return modified;
+	}
+
+	public void setModified(boolean modified) {
+		this.modified = modified;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -106,6 +101,7 @@ public class Setting {
 
 		if (id != setting.id) return false;
 		if (sentenceCount != setting.sentenceCount) return false;
+		if (modified != setting.modified) return false;
 		if (backup != setting.backup) return false;
 		if (firstWordType != setting.firstWordType) return false;
 		if (secondWordType != setting.secondWordType) return false;
@@ -124,6 +120,7 @@ public class Setting {
 		result = 31 * result + thirdWordType.hashCode();
 		result = 31 * result + fourthWordType.hashCode();
 		result = 31 * result + created.hashCode();
+		result = 31 * result + (modified ? 1 : 0);
 		result = 31 * result + (backup ? 1 : 0);
 		return result;
 	}

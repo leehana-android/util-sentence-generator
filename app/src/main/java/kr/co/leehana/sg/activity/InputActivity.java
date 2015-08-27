@@ -161,7 +161,6 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		}
 	}
 
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -172,7 +171,6 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		}
 		return true;
 	}
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -461,6 +459,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				selectedWord.setWord(input.getText().toString());
+				selectedWord.setModified(true);
 				updateEditedWord(selectedWord);
 
 				initializeWordData(mCurrentTabPosition);

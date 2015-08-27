@@ -17,21 +17,8 @@ public class Favorite {
 	private int rate = 1;
 	private String createDate;
 	private boolean backup = true;
+	private boolean modified = false;
 	private boolean enabled;
-
-	public Favorite() {
-	}
-
-	public Favorite(boolean backup, String createDate, boolean enabled, GenreType genreType, int id, int parentId, int rate, String sentence) {
-		this.backup = backup;
-		this.createDate = createDate;
-		this.enabled = enabled;
-		this.genreType = genreType;
-		this.id = id;
-		this.parentId = parentId;
-		this.rate = rate;
-		this.sentence = sentence;
-	}
 
 	public boolean isBackup() {
 		return backup;
@@ -97,6 +84,14 @@ public class Favorite {
 		this.sentence = sentence;
 	}
 
+	public boolean isModified() {
+		return modified;
+	}
+
+	public void setModified(boolean modified) {
+		this.modified = modified;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -108,6 +103,7 @@ public class Favorite {
 		if (parentId != favorite.parentId) return false;
 		if (rate != favorite.rate) return false;
 		if (backup != favorite.backup) return false;
+		if (modified != favorite.modified) return false;
 		if (enabled != favorite.enabled) return false;
 		if (!sentence.equals(favorite.sentence)) return false;
 		if (genreType != favorite.genreType) return false;
@@ -124,6 +120,7 @@ public class Favorite {
 		result = 31 * result + rate;
 		result = 31 * result + createDate.hashCode();
 		result = 31 * result + (backup ? 1 : 0);
+		result = 31 * result + (modified ? 1 : 0);
 		result = 31 * result + (enabled ? 1 : 0);
 		return result;
 	}

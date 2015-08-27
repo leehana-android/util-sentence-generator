@@ -31,12 +31,13 @@ public final class SGDatabases {
 	public static final String _C_SECOND_TYPE = "second_type";
 	public static final String _C_THIRD_TYPE = "third_type";
 	public static final String _C_FOURTH_TYPE = "fourth_type";
+	public static final String _C_MODIFIED = "modified";
 
 	public static final class CreateDB implements BaseColumns {
-		public static final String _WORD = "create table " + _T_WORD + " (" + _ID + " integer primary key autoincrement, " + _C_WORD + " text not null, " + _C_TYPE + " integer not null, " + _C_GENRE + " integer not null, " + _C_C_DATE + " text not null, " + _C_BACKUP + " integer);";
+		public static final String _WORD = "create table " + _T_WORD + " (" + _ID + " integer primary key autoincrement, " + _C_WORD + " text not null, " + _C_TYPE + " integer not null, " + _C_GENRE + " integer not null, " + _C_MODIFIED + " integer not null, " + _C_C_DATE + " text not null, " + _C_BACKUP + " integer);";
 		public static final String _HISTORY = "create table " + _T_HISTORY + " (" + _ID + " integer primary key autoincrement, " + _C_SENTENCE + " text not null, " + _C_GENRE + " integer not null, " + _C_C_DATE + " text not null, " + _C_BACKUP + " integer);";
-		public static final String _FAVORITE = "create table " + _T_FAVORITE + " (" + _ID + " integer primary key autoincrement, " + _C_PARENT + " integer not null, " + _C_SENTENCE + " text not null, " + _C_GENRE + " integer not null, " + _C_RATE + " integer not null, " + _C_ENABLED + " integer not null, " + _C_C_DATE + " text not null, " + _C_BACKUP + " integer);";
-		public static final String _FAVORITE_CATEGORY = "create table " + _T_FAVORITE_CATEGORY + " (" + _ID + " integer primary key autoincrement, " + _C_NAME + " text not null, " + _C_GENRE + " integer not null, " + _C_RATE + " integer not null, " + _C_ENABLED + " integer not null, " + _C_C_DATE + " text not null, " + _C_BACKUP + " integer);";
-		public static final String _SETTING = "create table " + _T_SETTING + " (" + _ID + " integer primary key autoincrement, " + _C_SENTENCE_COUNT + " integer not null, " + _C_FIRST_TYPE + " integer not null, " + _C_SECOND_TYPE + " integer not null, " + _C_THIRD_TYPE + " integer not null, " + _C_FOURTH_TYPE + " integer not null, " + _C_C_DATE + " text not null, " + _C_BACKUP + " integer);";
+		public static final String _FAVORITE = "create table " + _T_FAVORITE + " (" + _ID + " integer primary key autoincrement, " + _C_PARENT + " integer not null, " + _C_SENTENCE + " text not null, " + _C_GENRE + " integer not null, " + _C_RATE + " integer not null, " + _C_ENABLED + " integer not null, " + _C_MODIFIED + " integer not null, " + _C_C_DATE + " text not null, " + _C_BACKUP + " integer);";
+		public static final String _FAVORITE_CATEGORY = "create table " + _T_FAVORITE_CATEGORY + " (" + _ID + " integer primary key autoincrement, " + _C_NAME + " text not null, " + _C_GENRE + " integer not null, " + _C_RATE + " integer not null, " + _C_ENABLED + " integer not null, " + _C_MODIFIED + " integer not null, " + _C_C_DATE + " text not null, " + _C_BACKUP + " integer);";
+		public static final String _SETTING = "create table " + _T_SETTING + " (" + _ID + " integer primary key autoincrement, " + _C_SENTENCE_COUNT + " integer not null, " + _C_FIRST_TYPE + " integer not null, " + _C_SECOND_TYPE + " integer not null, " + _C_THIRD_TYPE + " integer not null, " + _C_FOURTH_TYPE + " integer not null, " + _C_MODIFIED + " integer not null, " + _C_C_DATE + " text not null, " + _C_BACKUP + " integer);";
 	}
 }

@@ -16,19 +16,8 @@ public class Word {
 	private WordType type;
 	private GenreType genreType;
 	private String createDate;
+	private boolean modified = false;
 	private boolean backup = true;
-
-	public Word() {
-	}
-
-	public Word(boolean backup, String createDate, GenreType genreType, int id, WordType type, String word) {
-		this.backup = backup;
-		this.createDate = createDate;
-		this.genreType = genreType;
-		this.id = id;
-		this.type = type;
-		this.word = word;
-	}
 
 	public boolean isBackup() {
 		return backup;
@@ -78,19 +67,28 @@ public class Word {
 		this.word = word;
 	}
 
+	public boolean isModified() {
+		return modified;
+	}
+
+	public void setModified(boolean modified) {
+		this.modified = modified;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		Word word = (Word) o;
+		Word word1 = (Word) o;
 
-		if (id != word.id) return false;
-		if (backup != word.backup) return false;
-		if (!this.word.equals(word.word)) return false;
-		if (type != word.type) return false;
-		if (genreType != word.genreType) return false;
-		return createDate.equals(word.createDate);
+		if (id != word1.id) return false;
+		if (modified != word1.modified) return false;
+		if (backup != word1.backup) return false;
+		if (!word.equals(word1.word)) return false;
+		if (type != word1.type) return false;
+		if (genreType != word1.genreType) return false;
+		return createDate.equals(word1.createDate);
 
 	}
 
@@ -101,6 +99,7 @@ public class Word {
 		result = 31 * result + type.hashCode();
 		result = 31 * result + genreType.hashCode();
 		result = 31 * result + createDate.hashCode();
+		result = 31 * result + (modified ? 1 : 0);
 		result = 31 * result + (backup ? 1 : 0);
 		return result;
 	}
