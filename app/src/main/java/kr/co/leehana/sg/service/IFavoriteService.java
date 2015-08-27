@@ -34,9 +34,11 @@ public interface IFavoriteService {
 
 	void delete(Favorite favorite);
 
-	void delete(int id);
+	void delete(List<Favorite> favorites);
 
 	void update(Favorite favorite);
+
+	void update(List<Favorite> favorites);
 
 	void insert(Favorite favorite);
 
@@ -56,7 +58,9 @@ public interface IFavoriteService {
 
 	void updateCategory(FavoriteCategory category);
 
+	void updateCategories(List<FavoriteCategory> categories);
+
 	void deleteCategory(FavoriteCategory category);
 
-	void deleteCategory(int id);
+	void deleteCategories(List<FavoriteCategory> categories);
 }

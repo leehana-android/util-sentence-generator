@@ -16,6 +16,7 @@ public class Word {
 	private WordType type;
 	private GenreType genreType;
 	private String createDate;
+	private boolean enabled = true;
 	private boolean modified = false;
 	private boolean backup = true;
 
@@ -75,6 +76,14 @@ public class Word {
 		this.modified = modified;
 	}
 
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -83,6 +92,7 @@ public class Word {
 		Word word1 = (Word) o;
 
 		if (id != word1.id) return false;
+		if (enabled != word1.enabled) return false;
 		if (modified != word1.modified) return false;
 		if (backup != word1.backup) return false;
 		if (!word.equals(word1.word)) return false;
@@ -99,6 +109,7 @@ public class Word {
 		result = 31 * result + type.hashCode();
 		result = 31 * result + genreType.hashCode();
 		result = 31 * result + createDate.hashCode();
+		result = 31 * result + (enabled ? 1 : 0);
 		result = 31 * result + (modified ? 1 : 0);
 		result = 31 * result + (backup ? 1 : 0);
 		return result;

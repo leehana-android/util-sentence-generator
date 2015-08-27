@@ -18,7 +18,7 @@ public class Favorite {
 	private String createDate;
 	private boolean backup = true;
 	private boolean modified = false;
-	private boolean enabled;
+	private boolean enabled = true;
 
 	public boolean isBackup() {
 		return backup;

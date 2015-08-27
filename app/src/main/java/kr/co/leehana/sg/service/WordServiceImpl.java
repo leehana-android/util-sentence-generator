@@ -42,11 +42,11 @@ public class WordServiceImpl implements IWordService {
 	public List<Word> getWords(WordType type, GenreType genreType) {
 		String tableName = SGDatabases._T_WORD;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_TYPE + "=?" + " AND " + SGDatabases._C_GENRE + "=?";
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_TYPE + "=? AND " + SGDatabases._C_GENRE + "=?";
 
 		String typeString = String.valueOf(type.getIndexCode());
 		String genreTypeString = String.valueOf(genreType.getIndexCode());
-		String[] whereArgs = new String[]{typeString, genreTypeString};
+		String[] whereArgs = new String[]{"1", typeString, genreTypeString};
 
 		String having = "";
 		String groupBy = "";
@@ -65,6 +65,7 @@ public class WordServiceImpl implements IWordService {
 			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
 			word.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
 			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			word.setEnabled(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_ENABLED))));
 
 			wordList.add(word);
 		}
@@ -75,9 +76,9 @@ public class WordServiceImpl implements IWordService {
 	public List<Word> getWords() {
 		String tableName = SGDatabases._T_WORD;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = "";
+		String whereClause = SGDatabases._C_ENABLED + "=?";
 
-		String[] whereArgs = new String[]{};
+		String[] whereArgs = new String[]{"1"};
 
 		String having = "";
 		String groupBy = "";
@@ -96,6 +97,7 @@ public class WordServiceImpl implements IWordService {
 			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
 			word.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
 			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			word.setEnabled(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_ENABLED))));
 
 			wordList.add(word);
 		}
@@ -106,8 +108,8 @@ public class WordServiceImpl implements IWordService {
 	public List<Word> getWordsByBackupStatus(boolean isBackup) {
 		String tableName = SGDatabases._T_WORD;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_BACKUP + "=?";
-		String[] whereArgs = new String[]{String.valueOf(BoolConverter.boolToInt(isBackup))};
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_BACKUP + "=?";
+		String[] whereArgs = new String[]{"1", String.valueOf(BoolConverter.boolToInt(isBackup))};
 		String groupBy = "";
 		String having = "";
 		String orderBy = SGDatabases._C_WORD + "," + SGDatabases._C_C_DATE + " DESC";
@@ -125,6 +127,7 @@ public class WordServiceImpl implements IWordService {
 			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
 			word.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
 			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			word.setEnabled(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_ENABLED))));
 
 			wordList.add(word);
 		}
@@ -135,8 +138,8 @@ public class WordServiceImpl implements IWordService {
 	public List<Word> getWordsByModifyStatus(boolean isModified) {
 		String tableName = SGDatabases._T_WORD;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_MODIFIED + "=?";
-		String[] whereArgs = new String[]{String.valueOf(BoolConverter.boolToInt(isModified))};
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_MODIFIED + "=?";
+		String[] whereArgs = new String[]{"1", String.valueOf(BoolConverter.boolToInt(isModified))};
 		String groupBy = "";
 		String having = "";
 		String orderBy = SGDatabases._C_WORD + "," + SGDatabases._C_C_DATE + " DESC";
@@ -154,6 +157,7 @@ public class WordServiceImpl implements IWordService {
 			word.setBackup(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_BACKUP))));
 			word.setModified(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_MODIFIED))));
 			word.setCreateDate(c.getString(c.getColumnIndex(SGDatabases._C_C_DATE)));
+			word.setEnabled(BoolConverter.intToBool(c.getInt(c.getColumnIndex(SGDatabases._C_ENABLED))));
 
 			wordList.add(word);
 		}
@@ -164,11 +168,11 @@ public class WordServiceImpl implements IWordService {
 	public int getCount(WordType type, GenreType genreType) {
 		String tableName = SGDatabases._T_WORD;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_TYPE + "=?" + " AND " + SGDatabases._C_GENRE + "=?";
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_TYPE + "=? AND " + SGDatabases._C_GENRE + "=?";
 
 		String typeString = String.valueOf(type.getIndexCode());
 		String genreTypeString = String.valueOf(genreType.getIndexCode());
-		String[] whereArgs = new String[]{typeString, genreTypeString};
+		String[] whereArgs = new String[]{"1", typeString, genreTypeString};
 
 		String groupBy = "";
 		String having = "";
@@ -188,6 +192,7 @@ public class WordServiceImpl implements IWordService {
 		newValues.put(SGDatabases._C_BACKUP, word.isBackup());
 		newValues.put(SGDatabases._C_MODIFIED, word.isModified());
 		newValues.put(SGDatabases._C_GENRE, word.getGenreType().getIndexCode());
+		newValues.put(SGDatabases._C_ENABLED, word.isEnabled());
 
 		String tableName = SGDatabases._T_WORD;
 		String nullColumnHack = "";
@@ -208,23 +213,16 @@ public class WordServiceImpl implements IWordService {
 
 	@Override
 	public void delete(Word word) {
-		delete(word.getId());
+		word.setEnabled(false);
+		update(word);
 	}
 
 	@Override
-	public void delete(int id) {
-		String tableName = SGDatabases._T_WORD;
-		String whereClause = SGDatabases.CreateDB._ID + "=?";
-		String[] whereArgs = {String.valueOf(id)};
-
-		helper.getWDb().delete(tableName, whereClause, whereArgs);
-	}
-
-	@Override
-	public void delete(List<Integer> ids) {
-		if (ids != null) {
-			for (Integer id : ids) {
-				delete(id);
+	public void delete(List<Word> words) {
+		if (words != null && !words.isEmpty()) {
+			for (Word word : words) {
+				word.setEnabled(false);
+				update(word);
 			}
 		}
 	}
@@ -239,11 +237,21 @@ public class WordServiceImpl implements IWordService {
 		updateValue.put(SGDatabases._C_BACKUP, word.isBackup());
 		updateValue.put(SGDatabases._C_MODIFIED, word.isModified());
 		updateValue.put(SGDatabases._C_GENRE, word.getGenreType().getIndexCode());
+		updateValue.put(SGDatabases._C_ENABLED, word.isEnabled());
 
 		String tableName = SGDatabases._T_WORD;
 		String whereClause = SGDatabases.CreateDB._ID + "=?";
 		String[] whereArgs = {wordIdStringValue};
 
 		return helper.getWDb().update(tableName, updateValue, whereClause, whereArgs);
+	}
+
+	@Override
+	public void update(List<Word> words) {
+		if (words != null && !words.isEmpty()) {
+			for (Word word : words) {
+				update(word);
+			}
+		}
 	}
 }

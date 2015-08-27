@@ -30,9 +30,9 @@ public interface IWordService {
 
 	void delete(Word word);
 
-	void delete(int id);
-
-	void delete(List<Integer> ids);
+	void delete(List<Word> words);
 
 	int update(Word word);
+
+	void update(List<Word> words);
 }

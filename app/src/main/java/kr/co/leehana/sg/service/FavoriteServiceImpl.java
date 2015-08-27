@@ -76,7 +76,7 @@ public class FavoriteServiceImpl implements IFavoriteService {
 		String tableName = SGDatabases._T_FAVORITE;
 		String[] selectColumns = new String[]{"*"};
 		String genreCode = String.valueOf(genreType.getIndexCode());
-		String whereClause = SGDatabases._C_ENABLED + "=?" + " AND " + SGDatabases._C_GENRE + "=?";
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_GENRE + "=?";
 		String[] whereArgs = new String[]{"1", genreCode};
 		String groupBy = "";
 		String having = "";
@@ -113,7 +113,7 @@ public class FavoriteServiceImpl implements IFavoriteService {
 
 		String tableName = SGDatabases._T_FAVORITE;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_ENABLED + "=?" + " AND " + SGDatabases._C_PARENT + "=?";
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_PARENT + "=?";
 		String[] whereArgs = {"1", String.valueOf(parentId)};
 		String groupBy = "";
 		String having = "";
@@ -145,7 +145,7 @@ public class FavoriteServiceImpl implements IFavoriteService {
 
 		String tableName = SGDatabases._T_FAVORITE;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_ENABLED + "=?" + " AND " + SGDatabases._C_RATE + "=?";
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_RATE + "=?";
 		String[] whereArgs = {"1", String.valueOf(rate)};
 		String groupBy = "";
 		String having = "";
@@ -177,8 +177,8 @@ public class FavoriteServiceImpl implements IFavoriteService {
 
 		String tableName = SGDatabases._T_FAVORITE;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_BACKUP + "=?";
-		String[] whereArgs = {String.valueOf(BoolConverter.boolToInt(isBackup))};
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " +SGDatabases._C_BACKUP + "=?";
+		String[] whereArgs = {"1", String.valueOf(BoolConverter.boolToInt(isBackup))};
 		String groupBy = "";
 		String having = "";
 		String orderBy = SGDatabases._C_C_DATE + " DESC";
@@ -239,7 +239,7 @@ public class FavoriteServiceImpl implements IFavoriteService {
 	public int getFavoriteCountInRate(int rate) {
 		String tableName = SGDatabases._T_FAVORITE;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_ENABLED + "=?" + " AND " + SGDatabases._C_RATE + "=?";
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_RATE + "=?";
 
 		String rateValue = String.valueOf(rate);
 		String[] whereArgs = new String[]{"1", rateValue};
@@ -258,7 +258,7 @@ public class FavoriteServiceImpl implements IFavoriteService {
 		String tableName = SGDatabases._T_FAVORITE;
 		String[] selectColumns = new String[]{"*"};
 
-		String whereClause = SGDatabases._C_ENABLED + "=?" + " AND " + SGDatabases._C_PARENT + "=?";
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_PARENT + "=?";
 
 		String categoryId = String.valueOf(parentId);
 		String[] whereArgs = new String[]{"1", categoryId};
@@ -274,18 +274,18 @@ public class FavoriteServiceImpl implements IFavoriteService {
 
 	@Override
 	public void delete(Favorite favorite) {
-		delete(favorite.getId());
+		favorite.setEnabled(false);
+		update(favorite);
 	}
 
 	@Override
-	public void delete(int id) {
-		String favoriteId = String.valueOf(id);
-
-		String tableName = SGDatabases._T_FAVORITE;
-		String whereClause = SGDatabases.CreateDB._ID + "=?";
-		String[] whereArgs = {favoriteId};
-
-		helper.getWDb().delete(tableName, whereClause, whereArgs);
+	public void delete(List<Favorite> favorites) {
+		if (favorites != null && !favorites.isEmpty()) {
+			for (Favorite favorite : favorites) {
+				favorite.setEnabled(false);
+				update(favorite);
+			}
+		}
 	}
 
 	@Override
@@ -305,6 +305,15 @@ public class FavoriteServiceImpl implements IFavoriteService {
 		String[] whereArgs = {String.valueOf(favorite.getId())};
 
 		helper.getWDb().update(tableName, newValues, whereClause, whereArgs);
+	}
+
+	@Override
+	public void update(List<Favorite> favorites) {
+		if (favorites != null && !favorites.isEmpty()) {
+			for (Favorite favorite : favorites) {
+				update(favorite);
+			}
+		}
 	}
 
 	@Override
@@ -373,7 +382,7 @@ public class FavoriteServiceImpl implements IFavoriteService {
 
 		String tableName = SGDatabases._T_FAVORITE_CATEGORY;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_ENABLED + "=?" + " AND " + SGDatabases._C_RATE + "=?";
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_RATE + "=?";
 		String[] whereArgs = {"1", String.valueOf(rate)};
 		String groupBy = "";
 		String having = "";
@@ -404,7 +413,7 @@ public class FavoriteServiceImpl implements IFavoriteService {
 
 		String tableName = SGDatabases._T_FAVORITE_CATEGORY;
 		String[] selectColumns = new String[]{"*"};
-		String whereClause = SGDatabases._C_BACKUP + "=?";
+		String whereClause = SGDatabases._C_ENABLED + "=? AND " + SGDatabases._C_BACKUP + "=?";
 		String[] whereArgs = {String.valueOf(BoolConverter.boolToInt(isBackup))};
 		String groupBy = "";
 		String having = "";
@@ -507,18 +516,27 @@ public class FavoriteServiceImpl implements IFavoriteService {
 	}
 
 	@Override
-	public void deleteCategory(FavoriteCategory category) {
-		deleteCategory(category.getId());
+	public void updateCategories(List<FavoriteCategory> categories) {
+		if (categories != null && !categories.isEmpty()) {
+			for (FavoriteCategory category : categories) {
+				updateCategory(category);
+			}
+		}
 	}
 
 	@Override
-	public void deleteCategory(int id) {
-		String favoriteId = String.valueOf(id);
+	public void deleteCategory(FavoriteCategory category) {
+		category.setEnabled(false);
+		updateCategory(category);
+	}
 
-		String tableName = SGDatabases._T_FAVORITE_CATEGORY;
-		String whereClause = SGDatabases.CreateDB._ID + "=?";
-		String[] whereArgs = {favoriteId};
-
-		helper.getWDb().delete(tableName, whereClause, whereArgs);
+	@Override
+	public void deleteCategories(List<FavoriteCategory> categories) {
+		if (categories != null && !categories.isEmpty()) {
+			for (FavoriteCategory category : categories) {
+				category.setEnabled(false);
+				updateCategory(category);
+			}
+		}
 	}
 }
