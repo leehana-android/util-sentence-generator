@@ -388,6 +388,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 							newWord.setType(TypeConverter.intToWordType(position));
 							newWord.setCreateDate(String.valueOf(System.currentTimeMillis()));
 							newWord.setGenreType(AppContext.getInstance().getGenreType());
+							newWord.setModified(false);
 
 							wordService.insert(newWord);
 
@@ -422,7 +423,7 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 		public void onStart() {
 			super.onStart();
 
-			/** Setting the multiselect choice mode for the listview */
+			/** Setting the multiSelect choice mode for the listView */
 			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
 			getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -459,7 +460,6 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				selectedWord.setWord(input.getText().toString());
-				selectedWord.setModified(true);
 				updateEditedWord(selectedWord);
 
 				initializeWordData(mCurrentTabPosition);
