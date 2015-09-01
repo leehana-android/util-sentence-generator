@@ -134,4 +134,6 @@
 	<string name="progress_sync_db">동기화 중입니다...</string>
 	<string name="db_sync_fail">동기화 실패!! (하나님께 문의)</string>
 	<string name="db_sync_complete">동기화 성공!!</string>
+	<string name="db_sync_confirm_dialog_msg">동기화를 진행 하시겠습니까?</string>
+	<string name="db_sync_confirm_dialog_title">동기화 진행 확인</string>
 </resources>

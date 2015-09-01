@@ -37,17 +37,9 @@ import kr.co.leehana.sg.utils.DbUtils;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-	private Button wordSyncBtn;
-	private Button showWordBtn;
-
-	private Button favoriteBtn;
-	private Button generateBtn;
-
 	private AlertDialog newWordGenreSelectDialog;
 
 	private Intent intent;
-
-	private ISettingService settingService;
 
 	private ProgressDialog mProgressDialog = null;
 	private Context mContext;
@@ -61,23 +53,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 		DbUtils.prepareDatabase(getBaseContext());
 
-		settingService = SettingServiceImpl.getInstance();
+		ISettingService settingService = SettingServiceImpl.getInstance();
 		((SettingServiceImpl) settingService).setHelper(DbHelperFactory.create(getBaseContext(), DbUtils.LOCAL_DATABASE_NAME));
 
 		if (AppContext.getInstance().getSetting() == null) {
 			AppContext.getInstance().setSetting(settingService.getSetting());
 		}
 
-		wordSyncBtn = (Button) findViewById(R.id.btn_word_sync);
+		Button wordSyncBtn = (Button) findViewById(R.id.btn_word_sync);
 		wordSyncBtn.setOnClickListener(this);
 
-		showWordBtn = (Button) findViewById(R.id.btn_show_word);
+		Button showWordBtn = (Button) findViewById(R.id.btn_show_word);
 		showWordBtn.setOnClickListener(this);
 
-		favoriteBtn = (Button) findViewById(R.id.btn_show_favorite);
+		Button favoriteBtn = (Button) findViewById(R.id.btn_show_favorite);
 		favoriteBtn.setOnClickListener(this);
 
-		generateBtn = (Button) findViewById(R.id.btn_generate);
+		Button generateBtn = (Button) findViewById(R.id.btn_generate);
 		generateBtn.setOnClickListener(this);
 
 		makeNewWordGenreSelectDialog();
@@ -106,7 +98,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 			} catch (Exception e) {
 				Log.e(AppProfile.TAG, "Exception : " + e.getMessage(), e);
 			} finally {
-				mProgressDialog.dismiss();
+				if (mProgressDialog != null) {
+					mProgressDialog.dismiss();
+				}
 			}
 			return null;
 		}
@@ -135,8 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-//				AppContext.getInstance().setState(AppContext.State.NEW_WORD);
-
 				if (intent != null) {
 					startActivity(intent);
 				}
@@ -180,17 +172,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		};
 	}
 
-	private void showNoSelectedAlertDialog() {
-		AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-		alertDialog.setTitle(R.string.no_selected_alert_title);
-		alertDialog.setMessage(getString(R.string.no_selected_alert_msg));
-		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
-		alertDialog.show();
+	private void showSyncConfirmDialog() {
+		final AlertDialog.Builder confirmDialog = new AlertDialog.Builder(this);
+		confirmDialog.setTitle(R.string.db_sync_confirm_dialog_title);
+		confirmDialog.setIcon(R.drawable.love_heart_48);
+		confirmDialog.setMessage(R.string.db_sync_confirm_dialog_msg);
+		confirmDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				mProgressDialog = ProgressDialog.show(mContext, "", getString(R.string.progress_sync_db), true);
+				new ProcessDatabaseSyncTask().execute(null, null, null);
+			}
+		});
+		confirmDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		confirmDialog.create().show();
 	}
 
 	@Override
@@ -228,61 +228,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 				newWordGenreSelectDialog.show();
 				break;
 			case R.id.btn_word_sync:
-//				AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-//				alertDialog.setTitle(R.string.no_selected_alert_title);
-//				alertDialog.setMessage(getString(R.string.msg_coming_soon));
-//				alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
-//						new DialogInterface.OnClickListener() {
-//							public void onClick(DialogInterface dialog, int which) {
-//								dialog.dismiss();
-//							}
-//						});
-//				alertDialog.show();
-
-				mProgressDialog = ProgressDialog.show(mContext, "", getString(R.string.progress_sync_db), true);
-				new ProcessDatabaseSyncTask().execute(null, null, null);
-//				if (DbUtils.sync(mContext)) {
-//					mProgressDialog.dismiss();
-//					showToastMessage(getString(R.string.db_sync_complete));
-////					runOnUiThread(new Runnable() {
-////						@Override
-////						public void run() {
-////							showToastMessage(getString(R.string.db_sync_complete));
-////						}
-////					});
-//				} else {
-//					mProgressDialog.dismiss();
-//					showToastMessage(getString(R.string.db_sync_fail));
-////					runOnUiThread(new Runnable() {
-////						@Override
-////						public void run() {
-////							showToastMessage(getString(R.string.db_sync_fail));
-////						}
-////					});
-//				}
-
-//				new Thread(new Runnable() {
-//					@Override
-//					public void run() {
-//						if (DbUtils.sync(mContext)) {
-//							mProgressDialog.dismiss();
-//							runOnUiThread(new Runnable() {
-//								@Override
-//								public void run() {
-//									showToastMessage(getString(R.string.db_sync_complete));
-//								}
-//							});
-//						} else {
-//							mProgressDialog.dismiss();
-//							runOnUiThread(new Runnable() {
-//								@Override
-//								public void run() {
-//									showToastMessage(getString(R.string.db_sync_fail));
-//								}
-//							});
-//						}
-//					}
-//				});
+				showSyncConfirmDialog();
 				break;
 			case R.id.btn_show_favorite:
 				intent = new Intent(this, FavoriteCategoriesActivity.class);

@@ -189,4 +189,6 @@
 
 	<string name="db_sync_fail">Database Sync Fail</string>
 	<string name="db_sync_complete">Database Sync Complete</string>
+	<string name="db_sync_confirm_dialog_title">Sync confirm</string>
+	<string name="db_sync_confirm_dialog_msg">Are you sync now?</string>
 </resources>
