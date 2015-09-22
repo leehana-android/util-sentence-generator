@@ -371,51 +371,52 @@ public class InputActivity extends AppCompatActivity implements ActionBar.TabLis
 			if (isInitializeAdapter) {
 				setListAdapter(createInputAdapter(getActivity().getBaseContext(), position));
 
-				wordInput = (EditText) view.findViewById(R.id.word_input);
-
-				if (inputType.equals(InputType.NEW)) {
-					wordInput.requestFocus();
-				}
-
-				inputButton = (Button) view.findViewById(R.id.btn_word_input);
-				inputButton.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						if (StringUtils.isNotBlank(wordInput.getText().toString())) {
-							Word newWord = new Word();
-							newWord.setWord(wordInput.getText().toString());
-							newWord.setBackup(true);
-							newWord.setType(TypeConverter.intToWordType(position));
-							newWord.setCreateDate(String.valueOf(System.currentTimeMillis()));
-							newWord.setGenreType(AppContext.getInstance().getGenreType());
-							newWord.setModified(false);
-
-							wordService.insert(newWord);
-
-							showToastMessage(getBaseContext(), "단어 생성 완료!");
-
-							wordsArray.get(position).add(0, newWord);
-
-							Spanned newSpannedWord = convertStringToSpanned("0. " + wordInput.getText().toString() + " [" + newWord.getId() + "]", newWord.getType());
-							wordSpannedArray.get(position).add(0, newSpannedWord);
-
-							ArrayAdapter adapter = (ArrayAdapter) getListView().getAdapter();
-							adapter.notifyDataSetChanged();
-
-							int totalWordCount = adapter.getCount();
-
-							Locale l = Locale.getDefault();
-							WordType showWordType = TypeConverter.intToWordType(position);
-							String newTabTitle = String.format(l, TAB_TITLE_FORMAT, getString(showWordType.getStringCode()).toUpperCase(l), totalWordCount);
-
-							tabs.get(position).setText(newTabTitle);
-						}
-						wordInput.setText("");
-					}
-				});
-
 				isInitializeAdapter = false;
 			}
+
+			wordInput = (EditText) view.findViewById(R.id.word_input);
+
+			if (inputType.equals(InputType.NEW)) {
+				wordInput.requestFocus();
+			}
+
+			inputButton = (Button) view.findViewById(R.id.btn_word_input);
+			inputButton.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (StringUtils.isNotBlank(wordInput.getText().toString())) {
+						Word newWord = new Word();
+						newWord.setWord(wordInput.getText().toString());
+						newWord.setBackup(true);
+						newWord.setType(TypeConverter.intToWordType(position));
+						newWord.setCreateDate(String.valueOf(System.currentTimeMillis()));
+						newWord.setGenreType(AppContext.getInstance().getGenreType());
+						newWord.setModified(false);
+
+						wordService.insert(newWord);
+
+						showToastMessage(getBaseContext(), "단어 생성 완료!");
+
+						wordsArray.get(position).add(0, newWord);
+
+						Spanned newSpannedWord = convertStringToSpanned("0. " + wordInput.getText().toString() + " [" + newWord.getId() + "]", newWord.getType());
+						wordSpannedArray.get(position).add(0, newSpannedWord);
+
+						ArrayAdapter adapter = (ArrayAdapter) getListView().getAdapter();
+						adapter.notifyDataSetChanged();
+
+						int totalWordCount = adapter.getCount();
+
+						Locale l = Locale.getDefault();
+						WordType showWordType = TypeConverter.intToWordType(position);
+						String newTabTitle = String.format(l, TAB_TITLE_FORMAT, getString(showWordType.getStringCode()).toUpperCase(l), totalWordCount);
+
+						tabs.get(position).setText(newTabTitle);
+					}
+					wordInput.setText("");
+				}
+			});
+
 			return view;
 		}
 
