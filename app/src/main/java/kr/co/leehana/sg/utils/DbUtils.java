@@ -47,7 +47,7 @@ public class DbUtils {
 	public static final String SERVER_DB_FULL_PATH = SYSTEM_DB_FULL_PATH + "_sv";
 
 	private static final String mUpLoadServerUri = "http://leehana.co.kr/UploadToServer.php";
-	private static final String mDownloadServerUri = "http://leehana.co.kr/sg/data/sg.db";
+	private static final String mDownloadServerUri = "http://sg.leehana.co.kr/data/sg.db";
 
 	private static String localBackupFileName;
 
@@ -56,7 +56,7 @@ public class DbUtils {
 		if (!bResult) {   // DB가 없으면 복사
 			copyDatabaseToSystemFolder(context);
 		}
-//		copyDatabaseToSystemFolder(context);
+		//copyDatabaseToSystemFolder(context);
 	}
 
 	private static boolean isDatabaseExistOnSystemFolder() {
