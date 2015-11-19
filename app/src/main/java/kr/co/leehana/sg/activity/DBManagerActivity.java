@@ -44,7 +44,7 @@ public class DBManagerActivity extends AppCompatActivity {
 	private int mServerResponseCode = 0;
 
 	private String mUpLoadServerUri = "http://leehana.co.kr/UploadToServer.php";
-	private String mDownloadServerUri = "http://leehana.co.kr/sg/data/sg.db";
+	private String mDownloadServerUri = "http://sg.leehana.co.kr/data/sg.db";
 	private String hostName = "leehana.co.kr";
 
 	/**********
