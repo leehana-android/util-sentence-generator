@@ -124,7 +124,7 @@
 
 	<string name="settings_sentence_count_dialog_title">Sentence Count</string>
 	<string name="settings_generate_count">Sentence Count</string>
-	<string name="settings_generate_count_sub">Generate sentence count (%d)</string>
+	<string name="settings_generate_count_sub">Generate sentence count (%s)</string>
 	<string-array name="settings_generate_count_list">
 		<item>20</item>
 		<item>30</item>
