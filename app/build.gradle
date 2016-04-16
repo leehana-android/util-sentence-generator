@@ -4,9 +4,9 @@ android {
 	signingConfigs {
 		config {
 			keyAlias 'release'
-			keyPassword 'gooGKSK819@gle'
-			storeFile file('C:/Users/Hana/Dropbox/dev/android_app_key/relase_key_35y.jks')
-			storePassword 'gooGKSK819@gle'
+			keyPassword ''
+			storeFile ''
+			storePassword ''
 		}
 	}
 	compileSdkVersion 23
